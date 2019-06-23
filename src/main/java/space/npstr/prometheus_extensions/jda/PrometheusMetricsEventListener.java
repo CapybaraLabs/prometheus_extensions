@@ -26,8 +26,8 @@ package space.npstr.prometheus_extensions.jda;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 /**
  * Collect metrics from events happening on the shard
@@ -45,7 +45,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGenericEvent(final Event event) {
+	public void onGenericEvent(final GenericEvent event) {
 		this.events.labels(event.getClass().getSimpleName()).inc();
 	}
 }

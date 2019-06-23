@@ -29,10 +29,10 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.impl.JDAImpl;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.internal.utils.cache.SnowflakeCacheViewImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class DistinctUsersCounter {
 			// careful, touching the map is in not all cases safe
 			// In this case, it just so happens to be safe, because the map is synchronized
 			// this means however, that for the (small) duration, the map cannot be used by other threads (if there are any)
-			shard -> ((JDAImpl) shard).getUserMap().forEachValue(adder)
+				shard -> ((SnowflakeCacheViewImpl<User>) shard.getUserCache()).getMap().forEachValue(adder)
 		);
 		return distinctUsers.size();
 	}
