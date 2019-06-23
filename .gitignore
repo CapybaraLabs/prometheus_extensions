@@ -1,5 +1,6 @@
 .idea/
 *.iml
+*.iws
 
 # Ignore Gradle project-specific cache directory
 .gradle
