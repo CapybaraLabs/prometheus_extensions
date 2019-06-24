@@ -78,7 +78,7 @@ public class DistinctUsersCounter {
 			// this means however, that for the (small) duration, the map cannot be used by other threads (if there are any)
 				shard -> {
 					SnowflakeCacheViewImpl<User> userCache = (SnowflakeCacheViewImpl<User>) shard.getUserCache();
-					try (var ignored = userCache.readLock()) {
+					try (var ignored = userCache.writeLock()) {
 						userCache.getMap().forEachValue(adder);
 					}
 				}
