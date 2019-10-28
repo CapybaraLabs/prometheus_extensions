@@ -84,14 +84,14 @@ public class JdaMetrics {
 			.labelNames("type")
 			.register(registry);
 
-		registerMeticsJobs();
+		registerMetricsJobs();
 	}
 
 	public int getDistinctUsers() {
 		return ((Double) this.distinctUsers.get()).intValue();
 	}
 
-	private void registerMeticsJobs() {
+	private void registerMetricsJobs() {
 		final Duration period = Duration.ofMinutes(1);
 
 		this.metricsScheduler.schedule(this::countDistinctUsers, period);
