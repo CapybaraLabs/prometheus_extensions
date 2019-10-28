@@ -26,6 +26,7 @@ package space.npstr.prometheus_extensions.jda;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
@@ -37,6 +38,8 @@ import net.dv8tion.jda.internal.requests.Route;
  * Collect metrics from events happening on the shard
  */
 class PrometheusMetricsEventListener extends ListenerAdapter {
+
+	public static final int NO_RESPONSE_CODE = 442;
 
 	private final RouteNamer routeNamer = new RouteNamer();
 	private final Counter events;
@@ -65,7 +68,10 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	public void onHttpRequest(@Nonnull final HttpRequestEvent event) {
 		final Response response = event.getResponse();
 
-		final String code = response != null ? String.valueOf(response.code) : "null";
+		final String code = Optional.ofNullable(response)
+				.map(r -> r.code)
+				.orElse(NO_RESPONSE_CODE)
+				.toString();
 		final Route route = event.getRoute().getBaseRoute();
 
 		final String routeName = this.routeNamer.lookUpRouteName(route)
