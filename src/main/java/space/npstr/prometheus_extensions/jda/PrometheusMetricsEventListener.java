@@ -26,15 +26,21 @@ package space.npstr.prometheus_extensions.jda;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.http.HttpRequestEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.Response;
+import net.dv8tion.jda.internal.requests.Route;
 
 /**
  * Collect metrics from events happening on the shard
  */
 class PrometheusMetricsEventListener extends ListenerAdapter {
 
+	private final RouteNamer routeNamer = new RouteNamer();
 	private final Counter events;
+	private final Counter httpRequests;
 
 	PrometheusMetricsEventListener(final CollectorRegistry registry) {
 		this.events = Counter.build()
@@ -42,10 +48,31 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.help("All events that JDA provides us with by class")
 			.labelNames("class")
 			.register(registry);
+
+		this.httpRequests = Counter.build()
+				.name("jda_restactions_total")
+				.help("JDA restactions and their HTTP responses")
+				.labelNames("status", "route")
+				.register();
 	}
 
 	@Override
 	public void onGenericEvent(final GenericEvent event) {
 		this.events.labels(event.getClass().getSimpleName()).inc();
 	}
+
+	@Override
+	public void onHttpRequest(@Nonnull final HttpRequestEvent event) {
+		final Response response = event.getResponse();
+
+		final String code = response != null ? String.valueOf(response.code) : "null";
+		final Route route = event.getRoute().getBaseRoute();
+
+		final String routeName = this.routeNamer.lookUpRouteName(route)
+				.orElse("UNKNOWN_ROUTE");
+
+		this.httpRequests.labels(code, routeName).inc();
+	}
+
+
 }
