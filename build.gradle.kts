@@ -11,12 +11,12 @@ repositories {
     jcenter()
 }
 
-val prometheusVersion   = "0.6.0"
+val prometheusVersion   = "0.8.0"
 val dsProxyVersion      = "1.5.1"
-val okHttpVersion       = "3.14.2"
-val jdaVersion          = "4.BETA.0_1"
+val okHttpVersion       = "3.14.4"
+val jdaVersion          = "4.0.0_54"
 val troveVersion        = "3.0.3"
-val fastutilVersion     = "8.2.3"
+val fastutilVersion     = "8.3.0"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
