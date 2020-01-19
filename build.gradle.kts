@@ -17,8 +17,8 @@ val jdaVersion          = "4.1.0_100"
 val troveVersion        = "3.0.3"
 val fastutilVersion     = "8.3.0"
 val jUnitVersion        = "5.5.2"
-val mockitoVersion      = "3.1.0"
-val assertJVersion      = "3.13.2"
+val mockitoVersion      = "3.2.4"
+val assertJVersion      = "3.14.0"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
