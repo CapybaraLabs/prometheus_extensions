@@ -74,8 +74,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 				.toString();
 		final Route route = event.getRoute().getBaseRoute();
 
-		final String routeName = this.routeNamer.lookUpRouteName(route)
-				.orElse("UNKNOWN_ROUTE");
+		final String routeName = this.routeNamer.lookUpRouteName(route);
 
 		this.httpRequests.labels(code, routeName).inc();
 	}

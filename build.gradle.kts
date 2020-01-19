@@ -13,8 +13,7 @@ repositories {
 
 val prometheusVersion   = "0.8.0"
 val dsProxyVersion      = "1.5.1"
-val okHttpVersion       = "3.14.4"
-val jdaVersion          = "4.0.0_54"
+val jdaVersion          = "4.1.0_100"
 val troveVersion        = "3.0.3"
 val fastutilVersion     = "8.3.0"
 val jUnitVersion        = "5.5.2"
@@ -25,7 +24,6 @@ dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
 
     compileOnly("net.ttddyy:datasource-proxy:$dsProxyVersion")
-    compileOnly("com.squareup.okhttp3:okhttp:$okHttpVersion")
 
     compileOnly("net.dv8tion:JDA:$jdaVersion")
     // required for user count hax

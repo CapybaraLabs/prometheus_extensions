@@ -24,6 +24,7 @@
 
 package space.npstr.prometheus_extensions.jda;
 
+import net.dv8tion.jda.internal.requests.Method;
 import net.dv8tion.jda.internal.requests.Route;
 import org.junit.jupiter.api.Test;
 
@@ -37,31 +38,31 @@ class RouteNamerTest {
     void routeNames() {
 
         assertThat(this.routeNamer.lookUpRouteName(Route.Misc.GET_VOICE_REGIONS))
-                .hasValue("GET_VOICE_REGIONS");
+                .isEqualTo("GET_VOICE_REGIONS");
         assertThat(this.routeNamer.lookUpRouteName(Route.Applications.DELETE_AUTHORIZED_APPLICATION))
-                .hasValue("DELETE_AUTHORIZED_APPLICATION");
+                .isEqualTo("DELETE_AUTHORIZED_APPLICATION");
         assertThat(this.routeNamer.lookUpRouteName(Route.Self.FRIEND_SUGGESTIONS))
-                .hasValue("FRIEND_SUGGESTIONS");
+                .isEqualTo("FRIEND_SUGGESTIONS");
         assertThat(this.routeNamer.lookUpRouteName(Route.Users.GET_PROFILE))
-                .hasValue("GET_PROFILE");
+                .isEqualTo("GET_PROFILE");
         assertThat(this.routeNamer.lookUpRouteName(Route.Relationships.ADD_RELATIONSHIP))
-                .hasValue("ADD_RELATIONSHIP");
+                .isEqualTo("ADD_RELATIONSHIP");
         assertThat(this.routeNamer.lookUpRouteName(Route.Guilds.BAN))
-                .hasValue("BAN");
+                .isEqualTo("BAN");
         assertThat(this.routeNamer.lookUpRouteName(Route.Emotes.MODIFY_EMOTE))
-                .hasValue("MODIFY_EMOTE");
+                .isEqualTo("MODIFY_EMOTE");
         assertThat(this.routeNamer.lookUpRouteName(Route.Webhooks.EXECUTE_WEBHOOK_GITHUB))
-                .hasValue("EXECUTE_WEBHOOK_GITHUB");
+                .isEqualTo("EXECUTE_WEBHOOK_GITHUB");
         assertThat(this.routeNamer.lookUpRouteName(Route.Roles.CREATE_ROLE))
-                .hasValue("CREATE_ROLE");
+                .isEqualTo("CREATE_ROLE");
         assertThat(this.routeNamer.lookUpRouteName(Route.Channels.MODIFY_PERM_OVERRIDE))
-                .hasValue("MODIFY_PERM_OVERRIDE");
+                .isEqualTo("MODIFY_PERM_OVERRIDE");
         assertThat(this.routeNamer.lookUpRouteName(Route.Messages.GET_MESSAGE_HISTORY))
-                .hasValue("GET_MESSAGE_HISTORY");
+                .isEqualTo("GET_MESSAGE_HISTORY");
         assertThat(this.routeNamer.lookUpRouteName(Route.Invites.GET_CHANNEL_INVITES))
-                .hasValue("GET_CHANNEL_INVITES");
-        assertThat(this.routeNamer.lookUpRouteName(Route.Custom.PATCH_ROUTE))
-                .hasValue("PATCH_ROUTE");
+                .isEqualTo("GET_CHANNEL_INVITES");
+        assertThat(this.routeNamer.lookUpRouteName(Route.custom(Method.PATCH, "/")))
+                .isEqualTo("CUSTOM_PATCH");
 
     }
 

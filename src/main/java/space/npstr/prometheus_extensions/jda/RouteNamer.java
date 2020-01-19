@@ -27,7 +27,6 @@ package space.npstr.prometheus_extensions.jda;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.internal.requests.Route;
 
@@ -53,8 +52,7 @@ public class RouteNamer {
                 Route.Roles.class,
                 Route.Channels.class,
                 Route.Messages.class,
-                Route.Invites.class,
-                Route.Custom.class
+                Route.Invites.class
         )
                 .stream()
                 .flatMap(c -> Arrays.stream(c.getDeclaredFields()))
@@ -62,7 +60,7 @@ public class RouteNamer {
                 .collect(Collectors.toList());
     }
 
-    public Optional<String> lookUpRouteName(final Route route) {
+    public String lookUpRouteName(final Route route) {
         return this.staticRouteFields.stream()
                 .filter(f -> {
                     try {
@@ -72,6 +70,7 @@ public class RouteNamer {
                     }
                 })
                 .map(Field::getName)
-                .findFirst();
+                .findFirst()
+                .orElse("CUSTOM_" + route.getMethod().name());
     }
 }
