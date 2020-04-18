@@ -137,7 +137,7 @@ public class JdaMetrics {
 	}
 
 	private long countEntities(final Function<JDA, CacheView<?>> toCacheView) {
-		return this.shardManager.getShardCache().stream()
+		return this.shardManager.getShards().stream()
 			.map(toCacheView)
 			.mapToLong(CacheView::size)
 			.sum();
