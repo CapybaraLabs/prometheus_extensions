@@ -119,25 +119,35 @@ public class JdaMetrics {
 
 	private void countEntities() {
 		this.discordEntities.labels("Category")
-			.set(countEntities(JDA::getCategoryCache));
-		this.discordEntities.labels("Emote")
-			.set(countEntities(JDA::getEmoteCache));
+			.set(countShardEntities(JDA::getCategoryCache));
 		this.discordEntities.labels("Guild")
-			.set(countEntities(JDA::getGuildCache));
+			.set(countShardEntities(JDA::getGuildCache));
 		this.discordEntities.labels("PrivateChannel")
-			.set(countEntities(JDA::getPrivateChannelCache));
-		this.discordEntities.labels("Role")
-			.set(countEntities(JDA::getRoleCache));
+			.set(countShardEntities(JDA::getPrivateChannelCache));
 		this.discordEntities.labels("TextChannel")
-			.set(countEntities(JDA::getTextChannelCache));
+			.set(countShardEntities(JDA::getTextChannelCache));
 		this.discordEntities.labels("User")
-			.set(countEntities(JDA::getUserCache));
+			.set(countShardEntities(JDA::getUserCache));
 		this.discordEntities.labels("VoiceChannel")
-			.set(countEntities(JDA::getVoiceChannelCache));
+			.set(countShardEntities(JDA::getVoiceChannelCache));
+
+		this.discordEntities.labels("Emote")
+			.set(countGuildEntities(Guild::getEmoteCache));
+		this.discordEntities.labels("Role")
+			.set(countGuildEntities(Guild::getRoleCache));
 	}
 
-	private long countEntities(final Function<JDA, CacheView<?>> toCacheView) {
+	private long countShardEntities(final Function<JDA, CacheView<?>> toCacheView) {
 		return this.shardManager.getShards().stream()
+			.map(toCacheView)
+			.mapToLong(CacheView::size)
+			.sum();
+	}
+
+	private long countGuildEntities(final Function<Guild, CacheView<?>> toCacheView) {
+		return this.shardManager.getShards().stream()
+			.map(JDA::getGuildCache)
+			.flatMap(CacheView::stream)
 			.map(toCacheView)
 			.mapToLong(CacheView::size)
 			.sum();
