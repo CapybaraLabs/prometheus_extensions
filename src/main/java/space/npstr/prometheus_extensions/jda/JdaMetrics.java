@@ -29,10 +29,13 @@ import io.prometheus.client.Gauge;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.utils.cache.CacheView;
 
 /**
  * Register and extract various metrics from JDA
@@ -116,20 +119,27 @@ public class JdaMetrics {
 
 	private void countEntities() {
 		this.discordEntities.labels("Category")
-			.set(this.shardManager.getCategoryCache().size());
+			.set(countEntities(JDA::getCategoryCache));
 		this.discordEntities.labels("Emote")
-			.set(this.shardManager.getEmoteCache().size());
+			.set(countEntities(JDA::getEmoteCache));
 		this.discordEntities.labels("Guild")
-			.set(this.shardManager.getGuildCache().size());
+			.set(countEntities(JDA::getGuildCache));
 		this.discordEntities.labels("PrivateChannel")
-			.set(this.shardManager.getPrivateChannelCache().size());
+			.set(countEntities(JDA::getPrivateChannelCache));
 		this.discordEntities.labels("Role")
-			.set(this.shardManager.getRoleCache().size());
+			.set(countEntities(JDA::getRoleCache));
 		this.discordEntities.labels("TextChannel")
-			.set(this.shardManager.getTextChannelCache().size());
+			.set(countEntities(JDA::getTextChannelCache));
 		this.discordEntities.labels("User")
-			.set(this.shardManager.getUserCache().size());
+			.set(countEntities(JDA::getUserCache));
 		this.discordEntities.labels("VoiceChannel")
-			.set(this.shardManager.getVoiceChannelCache().size());
+			.set(countEntities(JDA::getVoiceChannelCache));
+	}
+
+	private long countEntities(final Function<JDA, CacheView<?>> toCacheView) {
+		return this.shardManager.getShardCache().stream()
+			.map(toCacheView)
+			.mapToLong(CacheView::size)
+			.sum();
 	}
 }
