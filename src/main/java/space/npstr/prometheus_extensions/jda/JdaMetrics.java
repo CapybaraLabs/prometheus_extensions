@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.cache.CacheView;
+import net.dv8tion.jda.internal.JDAImpl;
 
 /**
  * Register and extract various metrics from JDA
@@ -50,6 +51,7 @@ public class JdaMetrics {
 	private final Gauge distinctUsers;
 	private final Gauge voiceChannelsConnected;
 	private final Gauge discordEntities;
+	private final Gauge unavailableGuilds;
 
 
 	public JdaMetrics(final ShardManager shardManager, final ScheduledExecutorService scheduler) {
@@ -85,6 +87,11 @@ public class JdaMetrics {
 			.name("discord_entities_current")
 			.help("How many entities are present")
 			.labelNames("type")
+			.register(registry);
+
+		this.unavailableGuilds = Gauge.build()
+			.name("discord_unavailable_guilds_current")
+			.help("How many guilds are unavailable")
 			.register(registry);
 
 		registerMetricsJobs();
@@ -135,6 +142,8 @@ public class JdaMetrics {
 			.set(countGuildEntities(Guild::getEmoteCache));
 		this.discordEntities.labels("Role")
 			.set(countGuildEntities(Guild::getRoleCache));
+
+		this.unavailableGuilds.set(countUnavailableGuilds());
 	}
 
 	private long countShardEntities(final Function<JDA, CacheView<?>> toCacheView) {
@@ -150,6 +159,13 @@ public class JdaMetrics {
 			.flatMap(CacheView::stream)
 			.map(toCacheView)
 			.mapToLong(CacheView::size)
+			.sum();
+	}
+
+	private long countUnavailableGuilds() {
+		return this.shardManager.getShards().stream()
+			.map(jda -> (JDAImpl) jda)
+			.mapToLong(jda -> jda.getUnavailableGuilds().size())
 			.sum();
 	}
 }
