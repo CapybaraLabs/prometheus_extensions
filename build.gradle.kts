@@ -1,7 +1,8 @@
 plugins {
     `java-library`
     `maven-publish`
-    `idea`
+    idea
+    id("com.github.ben-manes.versions") version "0.36.0"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -16,14 +17,14 @@ repositories {
     jcenter()
 }
 
-val prometheusVersion = "0.9.0"
+val prometheusVersion = "0.10.0"
 val dsProxyVersion = "1.7"
-val jdaVersion = "4.2.0_191"
+val jdaVersion = "4.2.0_227"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.4.1"
-val jUnitVersion = "5.6.2"
-val mockitoVersion = "3.4.6"
-val assertJVersion = "3.16.1"
+val fastutilVersion = "8.5.2"
+val jUnitVersion = "5.7.1"
+val mockitoVersion = "3.7.7"
+val assertJVersion = "3.19.0"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")

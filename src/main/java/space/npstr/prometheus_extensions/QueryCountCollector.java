@@ -92,8 +92,8 @@ public class QueryCountCollector extends Collector {
 		);
 		mfs.add(failure);
 
-		CounterMetricFamily time = new CounterMetricFamily("jdbc_time_total_seconds",
-			"Total query execution time", labelNames
+		CounterMetricFamily time = new CounterMetricFamily("jdbc_time_total",
+			"Total query execution time in seconds", labelNames
 		);
 		mfs.add(time);
 
