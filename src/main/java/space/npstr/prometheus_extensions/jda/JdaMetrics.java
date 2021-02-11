@@ -30,13 +30,19 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
+import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.requests.Request;
+import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.cache.CacheView;
+import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.internal.JDAImpl;
+import net.dv8tion.jda.internal.requests.RestActionImpl;
+import net.dv8tion.jda.internal.requests.Route;
 
 /**
  * Register and extract various metrics from JDA
@@ -53,6 +59,8 @@ public class JdaMetrics {
 	private final Gauge discordEntities;
 	private final Gauge unavailableGuilds;
 
+	private final Gauge sessionStartLimitTotal;
+	private final Gauge sessionStartLimitRemaining;
 
 	public JdaMetrics(final ShardManager shardManager, final ScheduledExecutorService scheduler) {
 		this(shardManager, scheduler, CollectorRegistry.defaultRegistry);
@@ -94,6 +102,17 @@ public class JdaMetrics {
 			.help("How many guilds are unavailable")
 			.register(registry);
 
+
+		this.sessionStartLimitTotal = Gauge.build()
+			.name("discord_session_start_limit_total")
+			.help("Maximum session start limit")
+			.register(registry);
+
+		this.sessionStartLimitRemaining = Gauge.build()
+			.name("discord_session_start_limit_remaining")
+			.help("Remaining session starts")
+			.register(registry);
+
 		registerMetricsJobs();
 	}
 
@@ -107,6 +126,36 @@ public class JdaMetrics {
 		this.metricsScheduler.schedule(this::countDistinctUsers, period);
 		this.metricsScheduler.schedule(this::countConnectedVoiceChannels, period);
 		this.metricsScheduler.schedule(this::countEntities, period);
+		this.metricsScheduler.schedule(this::sessionStartLimits, period);
+	}
+
+	private void sessionStartLimits() {
+		DataObject data = fetchSessionStartLimit(shardManager.getShards().stream().findAny().orElseThrow());
+		DataObject sessionStartLimit = data.getObject("session_start_limit");
+		int total = sessionStartLimit.getInt("total");
+		int remaining = sessionStartLimit.getInt("remaining");
+
+		this.sessionStartLimitTotal.set(total);
+		this.sessionStartLimitRemaining.set(remaining);
+	}
+
+	/**
+	 * 80% copied over from {@link net.dv8tion.jda.api.utils.SessionControllerAdapter#getShardedGateway(JDA)}
+	 */
+	private DataObject fetchSessionStartLimit(JDA api) {
+		return new RestActionImpl<DataObject>(api, Route.Misc.GATEWAY_BOT.compile()) {
+			@Override
+			public void handleResponse(Response response, Request<DataObject> request) {
+				if (response.isOk()) {
+					request.onSuccess(response.getObject());
+				} else if (response.code == 401) {
+					api.shutdownNow();
+					request.onFailure(new LoginException("The provided token is invalid!"));
+				} else {
+					request.onFailure(response);
+				}
+			}
+		}.priority().submit().join();
 	}
 
 	private void countDistinctUsers() {
