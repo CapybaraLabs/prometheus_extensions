@@ -33,11 +33,15 @@ import net.dv8tion.jda.api.events.http.HttpRequestEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.internal.requests.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Collect metrics from events happening on the shard
  */
 class PrometheusMetricsEventListener extends ListenerAdapter {
+
+	private static final Logger log = LoggerFactory.getLogger(PrometheusMetricsEventListener.class);
 
 	public static final int NO_RESPONSE_CODE = 442;
 
@@ -73,9 +77,18 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 
 	@Override
 	public void onDisconnect(final DisconnectEvent event) {
-		final String code = Optional.ofNullable(event.getCloseCode())
-			.map(closeCode -> Integer.toString(closeCode.getCode()))
+		if (!event.isClosedByServer()) {
+			return;
+		}
+		String code = Optional.ofNullable(event.getServiceCloseFrame()).stream()
+			.peek(frame -> log.info("Shard {} websocket closed by server with {} {}",
+				event.getJDA().getShardInfo().getShardId(),
+				frame.getCloseCode(), frame.getCloseReason())
+			)
+			.map(frame -> Integer.toString(frame.getCloseCode()))
+			.findAny()
 			.orElse("null");
+
 		this.closeCodes.labels(code).inc();
 	}
 
