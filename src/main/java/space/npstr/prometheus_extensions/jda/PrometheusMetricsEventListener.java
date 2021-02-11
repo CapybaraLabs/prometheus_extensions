@@ -27,7 +27,7 @@ package space.npstr.prometheus_extensions.jda;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -44,6 +44,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	private final RouteNamer routeNamer = new RouteNamer();
 	private final Counter events;
 	private final Counter httpRequests;
+	private final Counter closeCodes;
 
 	PrometheusMetricsEventListener(final CollectorRegistry registry) {
 		this.events = Counter.build()
@@ -57,6 +58,12 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.help("JDA restactions and their HTTP responses")
 			.labelNames("status", "route")
 			.register();
+
+		this.closeCodes = Counter.build()
+			.name("discord_websocket_close_codes_total")
+			.help("Close codes of the main websocket connections")
+			.labelNames("code")
+			.register(registry);
 	}
 
 	@Override
@@ -65,7 +72,15 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onHttpRequest(@Nonnull final HttpRequestEvent event) {
+	public void onDisconnect(final DisconnectEvent event) {
+		final String code = Optional.ofNullable(event.getCloseCode())
+			.map(closeCode -> Integer.toString(closeCode.getCode()))
+			.orElse("null");
+		this.closeCodes.labels(code).inc();
+	}
+
+	@Override
+	public void onHttpRequest(final HttpRequestEvent event) {
 		final Response response = event.getResponse();
 
 		final String code = Optional.ofNullable(response)
