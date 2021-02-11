@@ -37,40 +37,40 @@ import static java.lang.reflect.Modifier.isStatic;
  */
 public class RouteNamer {
 
-    private final List<Field> staticRouteFields;
+	private final List<Field> staticRouteFields;
 
-    public RouteNamer() {
-        this.staticRouteFields = List.of(
-                Route.Misc.class,
-                Route.Applications.class,
-                Route.Self.class,
-                Route.Users.class,
-                Route.Relationships.class,
-                Route.Guilds.class,
-                Route.Emotes.class,
-                Route.Webhooks.class,
-                Route.Roles.class,
-                Route.Channels.class,
-                Route.Messages.class,
-                Route.Invites.class
-        )
-                .stream()
-                .flatMap(c -> Arrays.stream(c.getDeclaredFields()))
-                .filter(f -> isStatic(f.getModifiers()))
-                .collect(Collectors.toList());
-    }
+	public RouteNamer() {
+		this.staticRouteFields = List.of(
+			Route.Misc.class,
+			Route.Applications.class,
+			Route.Self.class,
+			Route.Users.class,
+			Route.Relationships.class,
+			Route.Guilds.class,
+			Route.Emotes.class,
+			Route.Webhooks.class,
+			Route.Roles.class,
+			Route.Channels.class,
+			Route.Messages.class,
+			Route.Invites.class
+		)
+			.stream()
+			.flatMap(c -> Arrays.stream(c.getDeclaredFields()))
+			.filter(f -> isStatic(f.getModifiers()))
+			.collect(Collectors.toList());
+	}
 
-    public String lookUpRouteName(final Route route) {
-        return this.staticRouteFields.stream()
-                .filter(f -> {
-                    try {
-                        return f.get(null) == route;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .map(Field::getName)
-                .findFirst()
-                .orElse("CUSTOM_" + route.getMethod().name());
-    }
+	public String lookUpRouteName(final Route route) {
+		return this.staticRouteFields.stream()
+			.filter(f -> {
+				try {
+					return f.get(null) == route;
+				} catch (final Exception e) {
+					return false;
+				}
+			})
+			.map(Field::getName)
+			.findFirst()
+			.orElse("CUSTOM_" + route.getMethod().name());
+	}
 }

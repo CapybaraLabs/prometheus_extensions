@@ -76,12 +76,12 @@ public class DistinctUsersCounter {
 			// careful, touching the map is in not all cases safe
 			// In this case, it just so happens to be safe, because the map is synchronized
 			// this means however, that for the (small) duration, the map cannot be used by other threads (if there are any)
-				shard -> {
-					SnowflakeCacheViewImpl<User> userCache = (SnowflakeCacheViewImpl<User>) shard.getUserCache();
-					try (var ignored = userCache.writeLock()) {
-						userCache.getMap().forEachValue(adder);
-					}
+			shard -> {
+				SnowflakeCacheViewImpl<User> userCache = (SnowflakeCacheViewImpl<User>) shard.getUserCache();
+				try (var ignored = userCache.writeLock()) {
+					userCache.getMap().forEachValue(adder);
 				}
+			}
 		);
 		return distinctUsers.size();
 	}

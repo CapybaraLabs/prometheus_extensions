@@ -53,10 +53,10 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.register(registry);
 
 		this.httpRequests = Counter.build()
-				.name("jda_restactions_total")
-				.help("JDA restactions and their HTTP responses")
-				.labelNames("status", "route")
-				.register();
+			.name("jda_restactions_total")
+			.help("JDA restactions and their HTTP responses")
+			.labelNames("status", "route")
+			.register();
 	}
 
 	@Override
@@ -69,9 +69,9 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 		final Response response = event.getResponse();
 
 		final String code = Optional.ofNullable(response)
-				.map(r -> r.code)
-				.orElse(NO_RESPONSE_CODE)
-				.toString();
+			.map(r -> r.code)
+			.orElse(NO_RESPONSE_CODE)
+			.toString();
 		final Route route = event.getRoute().getBaseRoute();
 
 		final String routeName = this.routeNamer.lookUpRouteName(route);
