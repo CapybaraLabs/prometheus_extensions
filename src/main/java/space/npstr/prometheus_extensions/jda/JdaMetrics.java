@@ -165,7 +165,6 @@ public class JdaMetrics {
 	private void countConnectedVoiceChannels() {
 		final long count = this.shardManager.getGuildCache().stream()
 			.map(Guild::getSelfMember)
-			.filter(Objects::nonNull)
 			.map(Member::getVoiceState)
 			.filter(Objects::nonNull)
 			.filter(GuildVoiceState::inVoiceChannel)
