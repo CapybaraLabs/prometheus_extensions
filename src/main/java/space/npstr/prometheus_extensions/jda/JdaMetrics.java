@@ -126,7 +126,7 @@ public class JdaMetrics {
 		this.metricsScheduler.schedule(this::countDistinctUsers, period);
 		this.metricsScheduler.schedule(this::countConnectedVoiceChannels, period);
 		this.metricsScheduler.schedule(this::countEntities, period);
-		this.metricsScheduler.schedule(this::sessionStartLimits, period);
+		this.metricsScheduler.schedule(this::sessionStartLimits, period, false);
 	}
 
 	private void sessionStartLimits() {

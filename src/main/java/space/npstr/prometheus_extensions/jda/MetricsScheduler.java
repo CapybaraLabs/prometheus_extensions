@@ -47,13 +47,17 @@ class MetricsScheduler {
 		this.shardManager = shardManager;
 	}
 
-	public void schedule(final Runnable runnable, final Duration period) {
+	public void schedule(Runnable runnable, Duration period) {
+		schedule(runnable, period, true);
+	}
+
+	public void schedule(Runnable runnable, Duration period, boolean requireAllShards) {
 		this.scheduler.scheduleAtFixedRate(() -> {
 			try {
-				final boolean anyDisconnectedShards = this.shardManager.getShardCache().stream()
-					.anyMatch(jda -> jda.getStatus() != JDA.Status.CONNECTED);
+				boolean allShardsAreConnected = this.shardManager.getShardCache().stream()
+					.allMatch(jda -> jda.getStatus() == JDA.Status.CONNECTED);
 
-				if (!anyDisconnectedShards) {
+				if (!requireAllShards || allShardsAreConnected) {
 					runnable.run();
 				}
 			} catch (final Exception e) {
