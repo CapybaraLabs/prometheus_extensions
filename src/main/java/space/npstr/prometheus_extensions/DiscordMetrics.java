@@ -27,6 +27,7 @@ package space.npstr.prometheus_extensions;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import io.prometheus.client.Summary;
 
 public class DiscordMetrics {
 
@@ -39,6 +40,9 @@ public class DiscordMetrics {
 
 	private final Counter closeCodes;
 	private final Counter events;
+
+	private final Summary discordRestRequests;
+	private final Counter discordRestHardFailures;
 
 	public DiscordMetrics(final CollectorRegistry registry) {
 		this.voiceChannelsConnected = Gauge.build()
@@ -79,6 +83,18 @@ public class DiscordMetrics {
 			.help("Close codes of the main websocket connections")
 			.labelNames("code")
 			.register(registry);
+
+		this.discordRestRequests = Summary.build()
+			.name("discord_rest_request_seconds")
+			.help("Total Discord REST requests sent and their received responses")
+			.labelNames("method", "uri", "status", "error")
+			.register();
+
+		this.discordRestHardFailures = Counter.build()
+			.name("discord_rest_request_hard_failures_total")
+			.help("Total Discord REST requests that experienced hard failures (not client response exceptions)")
+			.labelNames("method", "uri")
+			.register();
 	}
 
 	public Gauge getVoiceChannelsConnected() {
@@ -107,5 +123,13 @@ public class DiscordMetrics {
 
 	public Counter getCloseCodes() {
 		return closeCodes;
+	}
+
+	public Summary getDiscordRestRequests() {
+		return discordRestRequests;
+	}
+
+	public Counter getDiscordRestHardFailures() {
+		return discordRestHardFailures;
 	}
 }
