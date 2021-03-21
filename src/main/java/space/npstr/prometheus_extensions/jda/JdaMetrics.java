@@ -25,6 +25,7 @@
 package space.npstr.prometheus_extensions.jda;
 
 import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Gauge;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,6 +55,8 @@ public class JdaMetrics {
 	private final DistinctUsersCounter distinctUsersCounter;
 	private final DiscordMetrics discordMetrics;
 
+	private final Gauge distinctUsers;
+
 	public JdaMetrics(final ShardManager shardManager, final ScheduledExecutorService scheduler) {
 		this(shardManager, scheduler, CollectorRegistry.defaultRegistry);
 	}
@@ -74,11 +77,17 @@ public class JdaMetrics {
 		final var metricsEventListener = new PrometheusMetricsEventListener(registry);
 		this.shardManager.addEventListener(metricsEventListener);
 
+		this.distinctUsers = Gauge.build()
+			.name("jda_distinct_users_current")
+			.help("Total distinct users")
+			.register(registry);
+
+
 		registerMetricsJobs();
 	}
 
 	public int getDistinctUsers() {
-		return ((Double) this.discordMetrics.getDistinctUsers().get()).intValue();
+		return ((Double) this.distinctUsers.get()).intValue();
 	}
 
 	private void registerMetricsJobs() {
@@ -120,7 +129,7 @@ public class JdaMetrics {
 	}
 
 	private void countDistinctUsers() {
-		this.discordMetrics.getDistinctUsers().set(this.distinctUsersCounter.count());
+		this.distinctUsers.set(this.distinctUsersCounter.count());
 	}
 
 	private void countConnectedVoiceChannels() {

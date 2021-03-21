@@ -30,7 +30,6 @@ import io.prometheus.client.Gauge;
 
 public class DiscordMetrics {
 
-	private final Gauge distinctUsers;
 	private final Gauge voiceChannelsConnected;
 	private final Gauge discordEntities;
 	private final Gauge unavailableGuilds;
@@ -42,11 +41,6 @@ public class DiscordMetrics {
 	private final Counter events;
 
 	public DiscordMetrics(final CollectorRegistry registry) {
-		this.distinctUsers = Gauge.build()
-			.name("discord_distinct_users_current")
-			.help("Total distinct users")
-			.register(registry);
-
 		this.voiceChannelsConnected = Gauge.build()
 			.name("discord_voicechannels_connected_current")
 			.help("How many voice channel is the bot connected to")
@@ -85,10 +79,6 @@ public class DiscordMetrics {
 			.help("Close codes of the main websocket connections")
 			.labelNames("code")
 			.register(registry);
-	}
-
-	public Gauge getDistinctUsers() {
-		return distinctUsers;
 	}
 
 	public Gauge getVoiceChannelsConnected() {
