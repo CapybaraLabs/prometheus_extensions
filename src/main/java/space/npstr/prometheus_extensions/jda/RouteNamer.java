@@ -35,7 +35,7 @@ import static java.lang.reflect.Modifier.isStatic;
 /**
  * BiG uGlY hAcKs in here
  */
-public class RouteNamer {
+class RouteNamer {
 
 	private final List<Field> staticRouteFields;
 

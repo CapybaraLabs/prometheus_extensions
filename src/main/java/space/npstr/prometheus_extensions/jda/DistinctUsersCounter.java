@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * BiG uGlY hAcKs in here
  */
-public class DistinctUsersCounter {
+class DistinctUsersCounter {
 
 	private static final Logger log = LoggerFactory.getLogger(DistinctUsersCounter.class);
 
@@ -54,7 +54,7 @@ public class DistinctUsersCounter {
 	public int count() {
 		final long now = System.currentTimeMillis();
 		final int distinctUsers = countDistinctUsers(this.shardManager.getShards(), this.lastUserCount);
-		log.debug("Distinct  users counted: {} in {}ms", distinctUsers, System.currentTimeMillis() - now);
+		log.debug("Distinct users counted: {} in {}ms", distinctUsers, System.currentTimeMillis() - now);
 		this.lastUserCount.set(distinctUsers);
 		return distinctUsers;
 	}

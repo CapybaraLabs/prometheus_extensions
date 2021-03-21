@@ -25,7 +25,6 @@
 package space.npstr.prometheus_extensions.jda;
 
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +42,7 @@ import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.requests.RestActionImpl;
 import net.dv8tion.jda.internal.requests.Route;
+import space.npstr.prometheus_extensions.DiscordMetrics;
 
 /**
  * Register and extract various metrics from JDA
@@ -52,15 +52,7 @@ public class JdaMetrics {
 	private final ShardManager shardManager;
 	private final MetricsScheduler metricsScheduler;
 	private final DistinctUsersCounter distinctUsersCounter;
-
-
-	private final Gauge distinctUsers;
-	private final Gauge voiceChannelsConnected;
-	private final Gauge discordEntities;
-	private final Gauge unavailableGuilds;
-
-	private final Gauge sessionStartLimitTotal;
-	private final Gauge sessionStartLimitRemaining;
+	private final DiscordMetrics discordMetrics;
 
 	public JdaMetrics(final ShardManager shardManager, final ScheduledExecutorService scheduler) {
 		this(shardManager, scheduler, CollectorRegistry.defaultRegistry);
@@ -78,46 +70,15 @@ public class JdaMetrics {
 		this.shardManager = shardManager;
 		this.metricsScheduler = new MetricsScheduler(scheduler, shardManager);
 		this.distinctUsersCounter = new DistinctUsersCounter(shardManager);
+		this.discordMetrics = new DiscordMetrics(registry);
 		final var metricsEventListener = new PrometheusMetricsEventListener(registry);
 		this.shardManager.addEventListener(metricsEventListener);
-
-		this.distinctUsers = Gauge.build()
-			.name("discord_distinct_users_current")
-			.help("Total distinct users")
-			.register(registry);
-
-		this.voiceChannelsConnected = Gauge.build()
-			.name("discord_voicechannels_connected_current")
-			.help("How many voice channel is the bot connected to")
-			.register(registry);
-
-		this.discordEntities = Gauge.build()
-			.name("discord_entities_current")
-			.help("How many entities are present")
-			.labelNames("type")
-			.register(registry);
-
-		this.unavailableGuilds = Gauge.build()
-			.name("discord_unavailable_guilds_current")
-			.help("How many guilds are unavailable")
-			.register(registry);
-
-
-		this.sessionStartLimitTotal = Gauge.build()
-			.name("discord_session_start_limit_total")
-			.help("Maximum session start limit")
-			.register(registry);
-
-		this.sessionStartLimitRemaining = Gauge.build()
-			.name("discord_session_start_limit_remaining")
-			.help("Remaining session starts")
-			.register(registry);
 
 		registerMetricsJobs();
 	}
 
 	public int getDistinctUsers() {
-		return ((Double) this.distinctUsers.get()).intValue();
+		return ((Double) this.discordMetrics.getDistinctUsers().get()).intValue();
 	}
 
 	private void registerMetricsJobs() {
@@ -135,8 +96,8 @@ public class JdaMetrics {
 		int total = sessionStartLimit.getInt("total");
 		int remaining = sessionStartLimit.getInt("remaining");
 
-		this.sessionStartLimitTotal.set(total);
-		this.sessionStartLimitRemaining.set(remaining);
+		this.discordMetrics.getSessionStartLimitTotal().set(total);
+		this.discordMetrics.getSessionStartLimitRemaining().set(remaining);
 	}
 
 	/**
@@ -159,7 +120,7 @@ public class JdaMetrics {
 	}
 
 	private void countDistinctUsers() {
-		this.distinctUsers.set(this.distinctUsersCounter.count());
+		this.discordMetrics.getDistinctUsers().set(this.distinctUsersCounter.count());
 	}
 
 	private void countConnectedVoiceChannels() {
@@ -169,29 +130,29 @@ public class JdaMetrics {
 			.filter(Objects::nonNull)
 			.filter(GuildVoiceState::inVoiceChannel)
 			.count();
-		this.voiceChannelsConnected.set(count);
+		this.discordMetrics.getVoiceChannelsConnected().set(count);
 	}
 
 	private void countEntities() {
-		this.discordEntities.labels("Category")
+		this.discordMetrics.getDiscordEntities().labels("Category")
 			.set(countShardEntities(JDA::getCategoryCache));
-		this.discordEntities.labels("Guild")
+		this.discordMetrics.getDiscordEntities().labels("Guild")
 			.set(countShardEntities(JDA::getGuildCache));
-		this.discordEntities.labels("PrivateChannel")
+		this.discordMetrics.getDiscordEntities().labels("PrivateChannel")
 			.set(countShardEntities(JDA::getPrivateChannelCache));
-		this.discordEntities.labels("TextChannel")
+		this.discordMetrics.getDiscordEntities().labels("TextChannel")
 			.set(countShardEntities(JDA::getTextChannelCache));
-		this.discordEntities.labels("User")
+		this.discordMetrics.getDiscordEntities().labels("User")
 			.set(countShardEntities(JDA::getUserCache));
-		this.discordEntities.labels("VoiceChannel")
+		this.discordMetrics.getDiscordEntities().labels("VoiceChannel")
 			.set(countShardEntities(JDA::getVoiceChannelCache));
 
-		this.discordEntities.labels("Emote")
+		this.discordMetrics.getDiscordEntities().labels("Emote")
 			.set(countGuildEntities(Guild::getEmoteCache));
-		this.discordEntities.labels("Role")
+		this.discordMetrics.getDiscordEntities().labels("Role")
 			.set(countGuildEntities(Guild::getRoleCache));
 
-		this.unavailableGuilds.set(countUnavailableGuilds());
+		this.discordMetrics.getUnavailableGuilds().set(countUnavailableGuilds());
 	}
 
 	private long countShardEntities(final Function<JDA, CacheView<?>> toCacheView) {

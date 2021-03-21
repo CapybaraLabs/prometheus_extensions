@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.internal.requests.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import space.npstr.prometheus_extensions.DiscordMetrics;
 
 /**
  * Collect metrics from events happening on the shard
@@ -46,33 +47,21 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	public static final int NO_RESPONSE_CODE = 442;
 
 	private final RouteNamer routeNamer = new RouteNamer();
-	private final Counter events;
+	private final DiscordMetrics discordMetrics;
 	private final Counter httpRequests;
-	private final Counter closeCodes;
 
 	PrometheusMetricsEventListener(final CollectorRegistry registry) {
-		this.events = Counter.build()
-			.name("discord_events_received_total")
-			.help("All events that JDA provides us with by class")
-			.labelNames("class")
-			.register(registry);
-
+		this.discordMetrics = new DiscordMetrics(registry);
 		this.httpRequests = Counter.build()
 			.name("jda_restactions_total")
 			.help("JDA restactions and their HTTP responses")
 			.labelNames("status", "route")
 			.register();
-
-		this.closeCodes = Counter.build()
-			.name("discord_websocket_close_codes_total")
-			.help("Close codes of the main websocket connections")
-			.labelNames("code")
-			.register(registry);
 	}
 
 	@Override
 	public void onGenericEvent(final GenericEvent event) {
-		this.events.labels(event.getClass().getSimpleName()).inc();
+		this.discordMetrics.getEvents().labels(event.getClass().getSimpleName()).inc();
 	}
 
 	@Override
@@ -89,7 +78,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.findAny()
 			.orElse("null");
 
-		this.closeCodes.labels(code).inc();
+		this.discordMetrics.getCloseCodes().labels(code).inc();
 	}
 
 	@Override
