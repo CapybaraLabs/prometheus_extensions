@@ -185,7 +185,7 @@ public class D4JMetrics {
 		int code = event.getStatus().getCode();
 		this.discordMetrics.getCloseCodes().labels(Integer.toString(code)).inc();
 
-		log.info("Shard {} websocket closed by server with {} {}",
+		log.info("Shard {} websocket closed with {} {}",
 			formatShard(event.getShardInfo()), code, event.getStatus().getReason().orElse("No reason"),
 			event.getCause().orElse(null)
 		);

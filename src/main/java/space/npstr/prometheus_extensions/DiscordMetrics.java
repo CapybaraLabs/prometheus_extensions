@@ -86,6 +86,9 @@ public class DiscordMetrics {
 
 		this.discordRestRequests = Summary.build()
 			.name("discord_rest_request_seconds")
+			.quantile(0.5, 0.05)
+			.quantile(0.95, 0.05)
+			.quantile(0.99, 0.05)
 			.help("Total Discord REST requests sent and their received responses")
 			.labelNames("method", "uri", "status", "error")
 			.register();
