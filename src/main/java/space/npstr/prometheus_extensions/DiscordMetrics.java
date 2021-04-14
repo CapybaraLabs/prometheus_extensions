@@ -91,13 +91,13 @@ public class DiscordMetrics {
 			.quantile(0.99, 0.05)
 			.help("Total Discord REST requests sent and their received responses")
 			.labelNames("method", "uri", "status", "error")
-			.register();
+			.register(registry);
 
 		this.discordRestHardFailures = Counter.build()
 			.name("discord_rest_request_hard_failures_total")
 			.help("Total Discord REST requests that experienced hard failures (not client response exceptions)")
 			.labelNames("method", "uri")
-			.register();
+			.register(registry);
 	}
 
 	public Gauge getVoiceChannelsConnected() {

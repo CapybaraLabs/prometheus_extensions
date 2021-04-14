@@ -56,7 +56,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.name("jda_restactions_total")
 			.help("JDA restactions and their HTTP responses")
 			.labelNames("status", "route")
-			.register();
+			.register(registry);
 	}
 
 	@Override
