@@ -27,6 +27,7 @@ package space.npstr.prometheus_extensions;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
+import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 
 public class DiscordMetrics {
@@ -42,6 +43,7 @@ public class DiscordMetrics {
 	private final Counter events;
 
 	private final Summary discordRestRequests;
+	private final Histogram discordRestRequestResponseTime;
 	private final Counter discordRestHardFailures;
 
 	public DiscordMetrics(final CollectorRegistry registry) {
@@ -86,11 +88,14 @@ public class DiscordMetrics {
 
 		this.discordRestRequests = Summary.build()
 			.name("discord_rest_request_seconds")
-			.quantile(0.5, 0.05)
-			.quantile(0.95, 0.05)
-			.quantile(0.99, 0.05)
 			.help("Total Discord REST requests sent and their received responses")
 			.labelNames("method", "uri", "status", "error")
+			.register(registry);
+
+		this.discordRestRequestResponseTime = Histogram.build()
+			.name("discord_rest_request_response_time_seconds")
+			.exponentialBuckets(0.001, 1.7, 20)
+			.help("Discord REST request response time")
 			.register(registry);
 
 		this.discordRestHardFailures = Counter.build()
