@@ -38,6 +38,7 @@ public class DiscordMetrics {
 
 	private final Gauge sessionStartLimitTotal;
 	private final Gauge sessionStartLimitRemaining;
+	private final Gauge recommendedShardCount;
 
 	private final Counter closeCodes;
 	private final Counter events;
@@ -72,6 +73,11 @@ public class DiscordMetrics {
 		this.sessionStartLimitRemaining = Gauge.build()
 			.name("discord_session_start_limit_remaining")
 			.help("Remaining session starts")
+			.register(registry);
+
+		this.recommendedShardCount = Gauge.build()
+			.name("discord_recommended_shard_count")
+			.help("Recommended shard count")
 			.register(registry);
 
 		this.events = Counter.build()
@@ -123,6 +129,10 @@ public class DiscordMetrics {
 
 	public Gauge getSessionStartLimitRemaining() {
 		return sessionStartLimitRemaining;
+	}
+
+	public Gauge getRecommendedShardCount() {
+		return recommendedShardCount;
 	}
 
 	public Counter getEvents() {

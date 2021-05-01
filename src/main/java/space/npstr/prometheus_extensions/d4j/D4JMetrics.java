@@ -102,6 +102,9 @@ public class D4JMetrics {
 					return Mono.empty();
 				})
 			)
+			.doOnNext(gatewayData -> gatewayData.shards().toOptional().ifPresent(recommendedShards ->
+				this.discordMetrics.getRecommendedShardCount().set(recommendedShards)
+			))
 			.flatMap(gatewayData -> gatewayData.sessionStartLimit().toOptional().map(Mono::just).orElse(Mono.empty()))
 			.doOnNext(sessionStartLimitData -> {
 				this.discordMetrics.getSessionStartLimitTotal().set(sessionStartLimitData.total());
