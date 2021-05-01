@@ -87,6 +87,8 @@ public class InstrumentedRouter implements Router {
 		this.discordMetrics.getDiscordRestRequests()
 			.labels(method.name(), uriTemplate, Integer.toString(status.code()), "")
 			.observe(responseTimeSeconds);
+		this.discordMetrics.getDiscordRestRequestResponseTime()
+			.observe(responseTimeSeconds);
 	}
 
 	private void instrumentError(Throwable throwable, DiscordWebRequest request) {
@@ -107,6 +109,8 @@ public class InstrumentedRouter implements Router {
 			log.trace("{} {} {}ms {} {} {}", method, uriTemplate, responseTimeMillis, status.code(), errorCode, errorMessage);
 			this.discordMetrics.getDiscordRestRequests()
 				.labels(method.name(), uriTemplate, Integer.toString(status.code()), Integer.toString(errorCode))
+				.observe(responseTimeSeconds);
+			this.discordMetrics.getDiscordRestRequestResponseTime()
 				.observe(responseTimeSeconds);
 		} else {
 			log.warn("Failed request to {} {}", method, uriTemplate, throwable);

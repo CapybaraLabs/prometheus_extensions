@@ -137,6 +137,10 @@ public class DiscordMetrics {
 		return discordRestRequests;
 	}
 
+	public Histogram getDiscordRestRequestResponseTime() {
+		return discordRestRequestResponseTime;
+	}
+
 	public Counter getDiscordRestHardFailures() {
 		return discordRestHardFailures;
 	}
