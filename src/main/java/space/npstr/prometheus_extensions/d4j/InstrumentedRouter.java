@@ -113,7 +113,7 @@ public class InstrumentedRouter implements Router {
 			this.discordMetrics.getDiscordRestRequestResponseTime()
 				.observe(responseTimeSeconds);
 
-			if (errorCode == 401) {
+			if (status.code() == 401) {
 				log.warn("Encountered invalid token on route {} {} with message {}", method, uriTemplate, errorMessage, throwable);
 			}
 		} else {
