@@ -100,7 +100,7 @@ public class DiscordMetrics {
 
 		this.discordRestRequestResponseTime = Histogram.build()
 			.name("discord_rest_request_response_time_seconds")
-			.exponentialBuckets(0.001, 1.7, 20)
+			.exponentialBuckets(0.01, 1.5, 20)
 			.help("Discord REST request response time")
 			.register(registry);
 
