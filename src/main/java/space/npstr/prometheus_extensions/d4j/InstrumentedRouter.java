@@ -114,7 +114,8 @@ public class InstrumentedRouter implements Router {
 				.observe(responseTimeSeconds);
 
 			if (status.code() == 401) {
-				log.warn("Encountered invalid token on route {} {} with message {}", method, uriTemplate, errorMessage, throwable);
+				log.warn("Encountered invalid token on route {} {} with message {}, request: {}",
+					method, uriTemplate, errorMessage, request, throwable);
 			}
 		} else {
 			log.warn("Failed request to {} {}", method, uriTemplate, throwable);
