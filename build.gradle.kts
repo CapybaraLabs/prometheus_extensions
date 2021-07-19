@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("com.github.ben-manes.versions") version "0.36.0"
+    id("com.github.ben-manes.versions") version "0.39.0"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -14,20 +14,26 @@ java {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
+    maven {
+        url = uri("https://m2.dv8tion.net/releases")
+        content { includeModule("net.dv8tion", "JDA") }
+        content { includeGroup("club.minnced") }
+    }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") } // D4J snapshots
     maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "0.10.0"
+val prometheusVersion = "0.11.0"
 val dsProxyVersion = "1.7"
-val jdaVersion = "4.2.0_227"
+val jdaVersion = "4.3.0_298"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.2"
-val d4jCoreVersion = "3.2.0-20210518.021732-125" // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.0-SNAPSHOT/
-val jUnitVersion = "5.7.1"
-val mockitoVersion = "3.7.7"
-val assertJVersion = "3.19.0"
+val fastutilVersion = "8.5.4"
+// see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.0-SNAPSHOT/
+val d4jCoreVersion = "3.2.0-20210719.172115-164"
+val jUnitVersion = "5.7.2"
+val mockitoVersion = "3.11.2"
+val assertJVersion = "3.20.2"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
@@ -50,6 +56,20 @@ dependencies {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
+}
+
+// https://github.com/ben-manes/gradle-versions-plugin
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
 }
 
 publishing {
