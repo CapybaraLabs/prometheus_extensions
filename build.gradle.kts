@@ -24,16 +24,16 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "0.11.0"
+val prometheusVersion = "0.12.0"
 val dsProxyVersion = "1.7"
-val jdaVersion = "4.3.0_298"
+val jdaVersion = "4.3.0_331"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.4"
+val fastutilVersion = "8.5.6"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.0-SNAPSHOT/
-val d4jCoreVersion = "3.2.0-20210719.172115-164"
-val jUnitVersion = "5.7.2"
-val mockitoVersion = "3.11.2"
-val assertJVersion = "3.20.2"
+val d4jCoreVersion = "3.2.0"
+val jUnitVersion = "5.8.1"
+val mockitoVersion = "3.12.4"
+val assertJVersion = "3.21.0"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
