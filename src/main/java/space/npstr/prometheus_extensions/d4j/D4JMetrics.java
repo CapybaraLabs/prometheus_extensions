@@ -81,7 +81,7 @@ public class D4JMetrics {
 			.on(GuildCreateEvent.class)
 			.map(event -> event.getGuild().getId().asLong())
 			.doOnNext(unavailableGuilds::remove)
-			.doOnError(t -> log.warn("Failed to add unavailable guild", t))
+			.doOnError(t -> log.warn("Failed to remove unavailable guild", t))
 			.retry()
 			.subscribe();
 	}
