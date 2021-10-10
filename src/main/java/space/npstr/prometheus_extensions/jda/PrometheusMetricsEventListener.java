@@ -50,8 +50,8 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	private final DiscordMetrics discordMetrics;
 	private final Counter httpRequests;
 
-	PrometheusMetricsEventListener(final CollectorRegistry registry) {
-		this.discordMetrics = new DiscordMetrics(registry);
+	PrometheusMetricsEventListener(final CollectorRegistry registry, DiscordMetrics discordMetrics) {
+		this.discordMetrics = discordMetrics;
 		this.httpRequests = Counter.build()
 			.name("jda_restactions_total")
 			.help("JDA restactions and their HTTP responses")

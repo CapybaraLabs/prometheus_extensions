@@ -74,7 +74,7 @@ public class JdaMetrics {
 		this.metricsScheduler = new MetricsScheduler(scheduler, shardManager);
 		this.distinctUsersCounter = new DistinctUsersCounter(shardManager);
 		this.discordMetrics = new DiscordMetrics(registry);
-		final var metricsEventListener = new PrometheusMetricsEventListener(registry);
+		final var metricsEventListener = new PrometheusMetricsEventListener(registry, discordMetrics);
 		this.shardManager.addEventListener(metricsEventListener);
 
 		this.distinctUsers = Gauge.build()
