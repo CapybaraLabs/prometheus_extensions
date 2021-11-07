@@ -62,6 +62,7 @@ public class DiscordMetrics {
 		this.unavailableGuilds = Gauge.build()
 			.name("discord_unavailable_guilds_current")
 			.help("How many guilds are unavailable")
+			.labelNames("shard")
 			.register(registry);
 
 

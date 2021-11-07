@@ -32,8 +32,11 @@ import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.lifecycle.DisconnectEvent;
+import discord4j.core.event.domain.lifecycle.SessionInvalidatedEvent;
 import discord4j.gateway.ShardInfo;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -48,7 +51,7 @@ public class D4JMetrics {
 	private final DiscordMetrics discordMetrics;
 	private final GatewayDiscordClient gatewayDiscordClient;
 
-	private final Set<Long> unavailableGuilds = ConcurrentHashMap.newKeySet();
+	private final Map<Integer, Set<Long>> unavailableGuilds = new ConcurrentHashMap<>();
 
 	public D4JMetrics(DiscordMetrics discordMetrics, GatewayDiscordClient gatewayDiscordClient) {
 		this.discordMetrics = discordMetrics;
@@ -71,25 +74,46 @@ public class D4JMetrics {
 		this.gatewayDiscordClient.getEventDispatcher()
 			.on(GuildDeleteEvent.class)
 			.filter(GuildDeleteEvent::isUnavailable)
-			.map(event -> event.getGuildId().asLong())
-			.doOnNext(unavailableGuilds::add)
+			.doOnNext(event -> unavailableGuilds.compute(event.getShardInfo().getIndex(), (shardId, guildIds) -> {
+				if (guildIds == null) guildIds = new HashSet<>();
+				guildIds.add(event.getGuildId().asLong());
+				return guildIds;
+			}))
 			.doOnError(t -> log.warn("Failed to add unavailable guild", t))
 			.retry()
 			.subscribe();
 
 		this.gatewayDiscordClient.getEventDispatcher()
 			.on(GuildCreateEvent.class)
-			.map(event -> event.getGuild().getId().asLong())
-			.doOnNext(unavailableGuilds::remove)
+			.doOnNext(event ->
+				unavailableGuilds.compute(event.getShardInfo().getIndex(), (shardId, guildIds) -> {
+					if (guildIds == null) return null;
+					guildIds.remove(event.getGuild().getId().asLong());
+					if (guildIds.isEmpty()) return null;
+					return guildIds;
+				})
+			)
 			.doOnError(t -> log.warn("Failed to remove unavailable guild", t))
+			.retry()
+			.subscribe();
+
+		this.gatewayDiscordClient.getEventDispatcher()
+			.on(SessionInvalidatedEvent.class)
+			.doOnNext(event -> unavailableGuilds.compute(event.getShardInfo().getIndex(), (shardId, guildIds) -> null))
+			.doOnError(t -> log.warn("Failed to clear unavailable guilds", t))
 			.retry()
 			.subscribe();
 	}
 
 	private void instrumentUnavailableGuilds(Duration interval) {
 		Mono.just(1).repeat().delayElements(interval)
-			.map(__ -> this.unavailableGuilds.size())
-			.doOnNext(count -> this.discordMetrics.getUnavailableGuilds().set(this.unavailableGuilds.size()))
+			.doOnNext(__ -> {
+				for (Map.Entry<Integer, Set<Long>> entry : unavailableGuilds.entrySet()) {
+					int shardId = entry.getKey();
+					Set<Long> guildIds = entry.getValue();
+					this.discordMetrics.getUnavailableGuilds().labels(Integer.toString(shardId)).set(guildIds.size());
+				}
+			})
 			.doOnError(t -> log.warn("Failed to instrument unavailable guilds", t))
 			.subscribe();
 	}

@@ -40,7 +40,6 @@ import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.cache.CacheView;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.requests.RestActionImpl;
 import net.dv8tion.jda.internal.requests.Route;
 import space.npstr.prometheus_extensions.DiscordMetrics;
@@ -161,7 +160,7 @@ public class JdaMetrics {
 		this.discordMetrics.getDiscordEntities().labels("Role")
 			.set(countGuildEntities(Guild::getRoleCache));
 
-		this.discordMetrics.getUnavailableGuilds().set(countUnavailableGuilds());
+		countUnavailableGuilds(this.discordMetrics.getUnavailableGuilds());
 	}
 
 	private long countShardEntities(final Function<JDA, CacheView<?>> toCacheView) {
@@ -180,10 +179,11 @@ public class JdaMetrics {
 			.sum();
 	}
 
-	private long countUnavailableGuilds() {
-		return this.shardManager.getShards().stream()
-			.map(jda -> (JDAImpl) jda)
-			.mapToLong(jda -> jda.getUnavailableGuilds().size())
-			.sum();
+	private void countUnavailableGuilds(Gauge unavailableGuilds) {
+		for (JDA jda : this.shardManager.getShards()) {
+			int shardId = jda.getShardInfo().getShardId();
+			int size = jda.getUnavailableGuilds().size();
+			unavailableGuilds.labels(Integer.toString(shardId)).set(size);
+		}
 	}
 }

@@ -30,8 +30,8 @@ val dsProxyVersion = "1.7"
 val jdaVersion = "4.3.0_331"
 val troveVersion = "3.0.3"
 val fastutilVersion = "8.5.6"
-// see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.0-SNAPSHOT/
-val d4jCoreVersion = "3.2.0"
+// see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.1-SNAPSHOT/
+val d4jCoreVersion = "3.2.1-20211107.032016-18"
 val jUnitVersion = "5.8.1"
 val mockitoVersion = "3.12.4"
 val assertJVersion = "3.21.0"
