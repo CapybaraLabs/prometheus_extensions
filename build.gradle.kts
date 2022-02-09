@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("com.github.ben-manes.versions") version "0.39.0"
+    id("com.github.ben-manes.versions") version "0.42.0"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -25,16 +25,16 @@ repositories {
     maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "0.12.0"
+val prometheusVersion = "0.15.0"
 val dsProxyVersion = "1.7"
 val jdaVersion = "4.3.0_331"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.6"
+val fastutilVersion = "8.5.7"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.1-SNAPSHOT/
-val d4jCoreVersion = "3.2.1-20211107.032016-18"
-val jUnitVersion = "5.8.1"
-val mockitoVersion = "3.12.4"
-val assertJVersion = "3.21.0"
+val d4jCoreVersion = "3.2.1"
+val jUnitVersion = "5.8.2"
+val mockitoVersion = "4.3.1"
+val assertJVersion = "3.22.0"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
@@ -64,9 +64,10 @@ tasks.named<Test>("test") {
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
-    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val regex = "^[0-9,.v-_]+(-r)?$".toRegex()
     val isStable = stableKeyword || regex.matches(version)
-    return isStable.not()
+    val isUnstable = listOf("ALPHA", "BETA").any { version.toUpperCase().contains(it) }
+    return isUnstable || isStable.not()
 }
 
 // https://github.com/ben-manes/gradle-versions-plugin
