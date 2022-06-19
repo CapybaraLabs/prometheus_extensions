@@ -21,20 +21,20 @@ repositories {
         content { includeModule("net.dv8tion", "JDA") }
         content { includeGroup("club.minnced") }
     }
-    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") } // D4J snapshots
-    maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
+//    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") } // D4J snapshots
+//    maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "0.15.0"
-val dsProxyVersion = "1.7"
-val jdaVersion = "4.3.0_331"
+val prometheusVersion = "0.16.0"
+val dsProxyVersion = "1.8"
+val jdaVersion = "4.4.0_352"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.7"
-// see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/3.2.1-SNAPSHOT/
-val d4jCoreVersion = "3.2.1"
+val fastutilVersion = "8.5.8"
+// see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
+val d4jCoreVersion = "3.2.2"
 val jUnitVersion = "5.8.2"
-val mockitoVersion = "4.3.1"
-val assertJVersion = "3.22.0"
+val mockitoVersion = "4.6.1"
+val assertJVersion = "3.23.1"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
@@ -64,7 +64,7 @@ tasks.named<Test>("test") {
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
-    val regex = "^[0-9,.v-_]+(-r)?$".toRegex()
+    val regex = "^[0-9,.v\\-_]+(-r)?$".toRegex()
     val isStable = stableKeyword || regex.matches(version)
     val isUnstable = listOf("ALPHA", "BETA").any { version.toUpperCase().contains(it) }
     return isUnstable || isStable.not()
