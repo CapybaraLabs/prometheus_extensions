@@ -29,11 +29,11 @@ val prometheusVersion = "0.16.0"
 val dsProxyVersion = "1.8"
 val jdaVersion = "4.4.0_352"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.8"
+val fastutilVersion = "8.5.9"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
 val d4jCoreVersion = "3.2.3"
-val jUnitVersion = "5.9.0"
-val mockitoVersion = "4.7.0"
+val jUnitVersion = "5.9.1"
+val mockitoVersion = "4.8.0"
 val assertJVersion = "3.23.1"
 
 dependencies {
