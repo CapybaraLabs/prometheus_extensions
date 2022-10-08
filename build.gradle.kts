@@ -3,10 +3,12 @@ plugins {
     `maven-publish`
     idea
     id("com.github.ben-manes.versions") version "0.42.0"
+    id("org.ajoberstar.grgit") version "5.0.0"
 }
 
 group = "space.npstr.prometheus_extensions"
-version = "0.0.1-SNAPSHOT"
+version = versionTag()
+println("Version: ${project.version}")
 
 java {
     targetCompatibility = JavaVersion.VERSION_11
@@ -83,4 +85,11 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+fun versionTag(): String {
+    val regex = Regex("^([0-9]+.[0-9]+.[0-9]+).*$")
+    val match = regex.find(grgit.describe(mapOf("tags" to true)))
+
+    return match?.value ?: "Unknown"
 }
