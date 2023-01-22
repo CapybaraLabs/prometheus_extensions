@@ -34,9 +34,9 @@ val troveVersion = "3.0.3"
 val fastutilVersion = "8.5.11"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
 val d4jCoreVersion = "3.2.3"
-val jUnitVersion = "5.9.1"
-val mockitoVersion = "4.11.0"
-val assertJVersion = "3.23.1"
+val jUnitVersion = "5.9.2"
+val mockitoVersion = "5.0.0"
+val assertJVersion = "3.24.2"
 
 dependencies {
     api("io.prometheus:simpleclient:$prometheusVersion")
