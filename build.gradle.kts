@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("com.github.ben-manes.versions") version "0.44.0"
+    id("com.github.ben-manes.versions") version "0.45.0"
     id("org.ajoberstar.grgit") version "5.0.0"
 }
 
@@ -35,7 +35,7 @@ val fastutilVersion = "8.5.11"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
 val d4jCoreVersion = "3.2.3"
 val jUnitVersion = "5.9.2"
-val mockitoVersion = "5.0.0"
+val mockitoVersion = "5.1.1"
 val assertJVersion = "3.24.2"
 
 dependencies {
