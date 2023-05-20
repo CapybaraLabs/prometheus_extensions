@@ -29,7 +29,7 @@ repositories {
 
 val prometheusVersion = "0.16.0"
 val dsProxyVersion = "1.8.1"
-val jdaVersion = "4.4.1_353"
+val jdaVersion = "5.0.0-beta.9"
 val troveVersion = "3.0.3"
 val fastutilVersion = "8.5.12"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/

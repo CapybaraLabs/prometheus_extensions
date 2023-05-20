@@ -27,12 +27,12 @@ package space.npstr.prometheus_extensions.jda;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import java.util.Optional;
-import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.Response;
-import net.dv8tion.jda.internal.requests.Route;
+import net.dv8tion.jda.api.requests.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import space.npstr.prometheus_extensions.DiscordMetrics;
@@ -65,7 +65,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onDisconnect(final DisconnectEvent event) {
+	public void onSessionDisconnect(SessionDisconnectEvent event) {
 		if (!event.isClosedByServer()) {
 			return;
 		}

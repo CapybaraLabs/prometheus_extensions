@@ -37,11 +37,11 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.requests.Request;
 import net.dv8tion.jda.api.requests.Response;
+import net.dv8tion.jda.api.requests.Route;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.cache.CacheView;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.internal.requests.RestActionImpl;
-import net.dv8tion.jda.internal.requests.Route;
 import space.npstr.prometheus_extensions.DiscordMetrics;
 
 /**
@@ -136,7 +136,7 @@ public class JdaMetrics {
 			.map(Guild::getSelfMember)
 			.map(Member::getVoiceState)
 			.filter(Objects::nonNull)
-			.filter(GuildVoiceState::inVoiceChannel)
+			.filter(GuildVoiceState::inAudioChannel)
 			.count();
 		this.discordMetrics.getVoiceChannelsConnected().set(count);
 	}
@@ -156,7 +156,7 @@ public class JdaMetrics {
 			.set(countShardEntities(JDA::getVoiceChannelCache));
 
 		this.discordMetrics.getDiscordEntities().labels("Emote")
-			.set(countGuildEntities(Guild::getEmoteCache));
+			.set(countGuildEntities(Guild::getEmojiCache));
 		this.discordMetrics.getDiscordEntities().labels("Role")
 			.set(countGuildEntities(Guild::getRoleCache));
 

@@ -24,8 +24,8 @@
 
 package space.npstr.prometheus_extensions.jda;
 
-import net.dv8tion.jda.internal.requests.Method;
-import net.dv8tion.jda.internal.requests.Route;
+import net.dv8tion.jda.api.requests.Method;
+import net.dv8tion.jda.api.requests.Route;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,28 +39,34 @@ class RouteNamerTest {
 
 		assertThat(this.routeNamer.lookUpRouteName(Route.Misc.GET_VOICE_REGIONS))
 			.isEqualTo("GET_VOICE_REGIONS");
-		assertThat(this.routeNamer.lookUpRouteName(Route.Applications.DELETE_AUTHORIZED_APPLICATION))
-			.isEqualTo("DELETE_AUTHORIZED_APPLICATION");
-		assertThat(this.routeNamer.lookUpRouteName(Route.Self.FRIEND_SUGGESTIONS))
-			.isEqualTo("FRIEND_SUGGESTIONS");
-		assertThat(this.routeNamer.lookUpRouteName(Route.Users.GET_PROFILE))
-			.isEqualTo("GET_PROFILE");
-		assertThat(this.routeNamer.lookUpRouteName(Route.Relationships.ADD_RELATIONSHIP))
-			.isEqualTo("ADD_RELATIONSHIP");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Applications.UPDATE_ROLE_CONNECTION_METADATA))
+			.isEqualTo("UPDATE_ROLE_CONNECTION_METADATA");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Interactions.EDIT_ALL_COMMAND_PERMISSIONS))
+			.isEqualTo("EDIT_ALL_COMMAND_PERMISSIONS");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Self.LEAVE_GUILD))
+			.isEqualTo("LEAVE_GUILD");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Users.GET_USER))
+			.isEqualTo("GET_USER");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Guilds.BAN))
 			.isEqualTo("BAN");
-		assertThat(this.routeNamer.lookUpRouteName(Route.Emotes.MODIFY_EMOTE))
-			.isEqualTo("MODIFY_EMOTE");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Emojis.MODIFY_EMOJI))
+			.isEqualTo("MODIFY_EMOJI");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Stickers.DELETE_GUILD_STICKER))
+			.isEqualTo("DELETE_GUILD_STICKER");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Webhooks.EXECUTE_WEBHOOK_GITHUB))
 			.isEqualTo("EXECUTE_WEBHOOK_GITHUB");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Roles.CREATE_ROLE))
 			.isEqualTo("CREATE_ROLE");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Channels.MODIFY_PERM_OVERRIDE))
 			.isEqualTo("MODIFY_PERM_OVERRIDE");
+		assertThat(this.routeNamer.lookUpRouteName(Route.StageInstances.UPDATE_INSTANCE))
+			.isEqualTo("UPDATE_INSTANCE");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Messages.GET_MESSAGE_HISTORY))
 			.isEqualTo("GET_MESSAGE_HISTORY");
 		assertThat(this.routeNamer.lookUpRouteName(Route.Invites.GET_CHANNEL_INVITES))
 			.isEqualTo("GET_CHANNEL_INVITES");
+		assertThat(this.routeNamer.lookUpRouteName(Route.Templates.MODIFY_TEMPLATE))
+			.isEqualTo("MODIFY_TEMPLATE");
 		assertThat(this.routeNamer.lookUpRouteName(Route.custom(Method.PATCH, "/")))
 			.isEqualTo("CUSTOM_PATCH");
 

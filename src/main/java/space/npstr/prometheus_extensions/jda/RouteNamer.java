@@ -28,7 +28,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.internal.requests.Route;
+import java.util.stream.Stream;
+import net.dv8tion.jda.api.requests.Route;
 
 import static java.lang.reflect.Modifier.isStatic;
 
@@ -40,21 +41,23 @@ class RouteNamer {
 	private final List<Field> staticRouteFields;
 
 	public RouteNamer() {
-		this.staticRouteFields = List.of(
+		this.staticRouteFields = Stream.of(
 			Route.Misc.class,
 			Route.Applications.class,
+			Route.Interactions.class,
 			Route.Self.class,
 			Route.Users.class,
-			Route.Relationships.class,
 			Route.Guilds.class,
-			Route.Emotes.class,
+			Route.Emojis.class,
+			Route.Stickers.class,
 			Route.Webhooks.class,
 			Route.Roles.class,
 			Route.Channels.class,
+			Route.StageInstances.class,
 			Route.Messages.class,
-			Route.Invites.class
+			Route.Invites.class,
+			Route.Templates.class
 		)
-			.stream()
 			.flatMap(c -> Arrays.stream(c.getDeclaredFields()))
 			.filter(f -> isStatic(f.getModifiers()))
 			.collect(Collectors.toList());

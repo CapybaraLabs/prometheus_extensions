@@ -30,7 +30,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.List;
-import javax.annotation.Nonnull;
 import okhttp3.Call;
 import okhttp3.Connection;
 import okhttp3.EventListener;
@@ -38,6 +37,7 @@ import okhttp3.Handshake;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
+import reactor.util.annotation.NonNull;
 
 public class OkHttpEventCounter extends EventListener {
 
@@ -57,102 +57,102 @@ public class OkHttpEventCounter extends EventListener {
 	}
 
 	@Override
-	public void callStart(final @Nonnull Call call) {
+	public void callStart(final @NonNull Call call) {
 		httpEventCounter.labels(this.instanceLabel, "callStart").inc();
 	}
 
 	@Override
-	public void dnsStart(@Nonnull final Call call, @Nonnull final String domainName) {
+	public void dnsStart(@NonNull final Call call, @NonNull final String domainName) {
 		httpEventCounter.labels(this.instanceLabel, "dnsStart").inc();
 	}
 
 	@Override
-	public void dnsEnd(@Nonnull final Call call, @Nonnull final String domainName, @Nonnull final List<InetAddress> inetAddressList) {
+	public void dnsEnd(@NonNull final Call call, @NonNull final String domainName, @NonNull final List<InetAddress> inetAddressList) {
 		httpEventCounter.labels(this.instanceLabel, "dnsEnd").inc();
 	}
 
 	@Override
-	public void connectStart(@Nonnull final Call call, @Nonnull final InetSocketAddress inetSocketAddress, @Nonnull final Proxy proxy) {
+	public void connectStart(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy) {
 		httpEventCounter.labels(this.instanceLabel, "connectStart").inc();
 	}
 
 	@Override
-	public void secureConnectStart(@Nonnull final Call call) {
+	public void secureConnectStart(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "secureConnectStart").inc();
 	}
 
 	@Override
-	public void secureConnectEnd(@Nonnull final Call call, final Handshake handshake) {
+	public void secureConnectEnd(@NonNull final Call call, final Handshake handshake) {
 		httpEventCounter.labels(this.instanceLabel, "secureConnectEnd").inc();
 	}
 
 	@Override
-	public void connectEnd(@Nonnull final Call call, @Nonnull final InetSocketAddress inetSocketAddress, @Nonnull final Proxy proxy, final Protocol protocol) {
+	public void connectEnd(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy, final Protocol protocol) {
 		httpEventCounter.labels(this.instanceLabel, "connectEnd").inc();
 	}
 
 	@Override
-	public void connectFailed(@Nonnull final Call call, @Nonnull final InetSocketAddress inetSocketAddress, @Nonnull final Proxy proxy, final Protocol protocol, @Nonnull final IOException ioe) {
+	public void connectFailed(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy, final Protocol protocol, @NonNull final IOException ioe) {
 		httpEventCounter.labels(this.instanceLabel, "connectFailed").inc();
 	}
 
 	@Override
-	public void connectionAcquired(@Nonnull final Call call, @Nonnull final Connection connection) {
+	public void connectionAcquired(@NonNull final Call call, @NonNull final Connection connection) {
 		httpEventCounter.labels(this.instanceLabel, "connectionAcquired").inc();
 	}
 
 	@Override
-	public void connectionReleased(@Nonnull final Call call, @Nonnull final Connection connection) {
+	public void connectionReleased(@NonNull final Call call, @NonNull final Connection connection) {
 		httpEventCounter.labels(this.instanceLabel, "connectionReleased").inc();
 	}
 
 	@Override
-	public void requestHeadersStart(@Nonnull final Call call) {
+	public void requestHeadersStart(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "requestHeadersStart").inc();
 	}
 
 	@Override
-	public void requestHeadersEnd(@Nonnull final Call call, @Nonnull final Request request) {
+	public void requestHeadersEnd(@NonNull final Call call, @NonNull final Request request) {
 		httpEventCounter.labels(this.instanceLabel, "requestHeadersEnd").inc();
 	}
 
 	@Override
-	public void requestBodyStart(@Nonnull final Call call) {
+	public void requestBodyStart(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "requestBodyStart").inc();
 	}
 
 	@Override
-	public void requestBodyEnd(@Nonnull final Call call, final long byteCount) {
+	public void requestBodyEnd(@NonNull final Call call, final long byteCount) {
 		httpEventCounter.labels(this.instanceLabel, "requestBodyEnd").inc();
 	}
 
 	@Override
-	public void responseHeadersStart(@Nonnull final Call call) {
+	public void responseHeadersStart(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "responseHeadersStart").inc();
 	}
 
 	@Override
-	public void responseHeadersEnd(@Nonnull final Call call, @Nonnull final Response response) {
+	public void responseHeadersEnd(@NonNull final Call call, @NonNull final Response response) {
 		httpEventCounter.labels(this.instanceLabel, "responseHeadersEnd").inc();
 	}
 
 	@Override
-	public void responseBodyStart(@Nonnull final Call call) {
+	public void responseBodyStart(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "responseBodyStart").inc();
 	}
 
 	@Override
-	public void responseBodyEnd(@Nonnull final Call call, final long byteCount) {
+	public void responseBodyEnd(@NonNull final Call call, final long byteCount) {
 		httpEventCounter.labels(this.instanceLabel, "responseBodyEnd").inc();
 	}
 
 	@Override
-	public void callEnd(@Nonnull final Call call) {
+	public void callEnd(@NonNull final Call call) {
 		httpEventCounter.labels(this.instanceLabel, "callEnd").inc();
 	}
 
 	@Override
-	public void callFailed(@Nonnull final Call call, @Nonnull final IOException ioe) {
+	public void callFailed(@NonNull final Call call, @NonNull final IOException ioe) {
 		httpEventCounter.labels(this.instanceLabel, "callFailed").inc();
 	}
 }
