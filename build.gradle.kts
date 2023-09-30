@@ -2,8 +2,8 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("com.github.ben-manes.versions") version "0.46.0"
-    id("org.ajoberstar.grgit") version "5.0.0"
+    id("com.github.ben-manes.versions") version "0.48.0"
+    id("org.ajoberstar.grgit") version "5.2.0"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -33,14 +33,15 @@ repositories {
 }
 
 val prometheusVersion = "0.16.0"
-val dsProxyVersion = "1.8.1"
-val jdaVersion = "5.0.0-beta.9"
+val dsProxyVersion = "1.9"
+val jdaVersion = "5.0.0-beta.14"
 val troveVersion = "3.0.3"
 val fastutilVersion = "8.5.12"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
-val d4jCoreVersion = "3.2.4"
-val jUnitVersion = "5.9.2"
-val mockitoVersion = "5.2.0"
+val d4jCoreVersion = "3.2.6"
+val jUnitPlatformVersion = "1.10.0"
+val jUnitVersion = "5.10.0"
+val mockitoVersion = "5.5.0"
 val assertJVersion = "3.24.2"
 
 dependencies {
@@ -55,6 +56,7 @@ dependencies {
 
     compileOnly("com.discord4j:discord4j-core:$d4jCoreVersion")
 
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:$jUnitPlatformVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
     testImplementation("net.dv8tion:JDA:$jdaVersion")
@@ -70,10 +72,10 @@ tasks.named<Test>("test") {
 }
 
 fun isNonStable(version: String): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
     val regex = "^[0-9,.v\\-_]+(-r)?$".toRegex()
     val isStable = stableKeyword || regex.matches(version)
-    val isUnstable = listOf("ALPHA", "BETA").any { version.toUpperCase().contains(it) }
+    val isUnstable = listOf("ALPHA", "BETA").any { version.uppercase().contains(it) }
     return isUnstable || isStable.not()
 }
 
