@@ -16,6 +16,9 @@ java {
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
     withSourcesJar()
+    consistentResolution {
+        useCompileClasspathVersions()
+    }
 }
 
 repositories {
