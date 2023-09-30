@@ -11,8 +11,10 @@ version = versionTag()
 println("Version: ${project.version}")
 
 java {
-    targetCompatibility = JavaVersion.VERSION_11
-    sourceCompatibility = JavaVersion.VERSION_11
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
     withSourcesJar()
 }
 
