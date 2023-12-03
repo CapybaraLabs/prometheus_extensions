@@ -32,7 +32,7 @@ repositories {
 //    maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "0.16.0"
+val prometheusVersion = "1.1.0"
 val dsProxyVersion = "1.9"
 val jdaVersion = "5.0.0-beta.18"
 val troveVersion = "3.0.3"
@@ -45,7 +45,7 @@ val mockitoVersion = "5.8.0"
 val assertJVersion = "3.24.2"
 
 dependencies {
-    api("io.prometheus:simpleclient:$prometheusVersion")
+    api("io.prometheus:prometheus-metrics-core:$prometheusVersion")
 
     compileOnly("net.ttddyy:datasource-proxy:$dsProxyVersion")
 

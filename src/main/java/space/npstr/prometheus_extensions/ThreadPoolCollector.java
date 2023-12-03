@@ -24,18 +24,16 @@
 
 package space.npstr.prometheus_extensions;
 
-import io.prometheus.client.Collector;
-import io.prometheus.client.CounterMetricFamily;
-import io.prometheus.client.GaugeMetricFamily;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import io.prometheus.metrics.core.metrics.CounterWithCallback;
+import io.prometheus.metrics.core.metrics.GaugeWithCallback;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-public class ThreadPoolCollector extends Collector {
+public class ThreadPoolCollector {
 
 	protected final ConcurrentMap<String, ThreadPoolExecutor> pools = new ConcurrentHashMap<>();
 
@@ -71,38 +69,39 @@ public class ThreadPoolCollector extends Collector {
 		this.pools.clear();
 	}
 
+	public ThreadPoolCollector(PrometheusRegistry registry) {
+		String[] labelNames = {"name"};
 
-	@Override
-	public List<MetricFamilySamples> collect() {
+		GaugeWithCallback.builder()
+			.name("threadpool_active_threads_current")
+			.help("Amount of active threads in a thread pool")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback::call, ThreadPoolExecutor::getActiveCount))
+			.register(registry);
 
-		List<MetricFamilySamples> mfs = new ArrayList<>();
-		List<String> labelNames = Collections.singletonList("name");
+		GaugeWithCallback.builder()
+			.name("threadpool_queue_size_current")
+			.help("Size of queue of a thread pool (including scheduled tasks)")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback::call, pool -> pool.getQueue().size()))
+			.register(registry);
 
-		GaugeMetricFamily activeThreads = new GaugeMetricFamily("threadpool_active_threads_current",
-			"Amount of active threads in a thread pool", labelNames
-		);
-		mfs.add(activeThreads);
+		CounterWithCallback.builder()
+			.name("threadpool_completed_tasks_total")
+			.help("Total completed tasks by a thread pool")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback::call, ThreadPoolExecutor::getCompletedTaskCount))
+			.register(registry);
+	}
 
-		GaugeMetricFamily queueSize = new GaugeMetricFamily("threadpool_queue_size_current",
-			"Size of queue of a thread pool (including scheduled tasks)", labelNames
-		);
-		mfs.add(queueSize);
-
-		CounterMetricFamily completedTasks = new CounterMetricFamily("threadpool_completed_tasks_total",
-			"Total completed tasks by a thread pool", labelNames
-		);
-		mfs.add(completedTasks);
-
-		for (Map.Entry<String, ThreadPoolExecutor> entry : this.pools.entrySet()) {
+	private void collect(BiConsumer<Double, String[]> callback, Function<ThreadPoolExecutor, Number> counter) {
+		for (var entry : this.pools.entrySet()) {
 			String poolName = entry.getKey();
+			String[] labels = {poolName};
 			ThreadPoolExecutor pool = entry.getValue();
-			List<String> labels = Collections.singletonList(poolName);
+			double value = counter.apply(pool).doubleValue();
 
-			activeThreads.addMetric(labels, pool.getActiveCount());
-			queueSize.addMetric(labels, pool.getQueue().size());
-			completedTasks.addMetric(labels, pool.getCompletedTaskCount()); //guaranteed to always increase, ergo good fit for a counter
+			callback.accept(value, labels);
 		}
-
-		return mfs;
 	}
 }

@@ -24,11 +24,11 @@
 
 package space.npstr.prometheus_extensions;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
+import io.prometheus.metrics.core.metrics.Counter;
+import io.prometheus.metrics.core.metrics.Gauge;
+import io.prometheus.metrics.core.metrics.Histogram;
+import io.prometheus.metrics.core.metrics.Summary;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 
 public class DiscordMetrics {
 
@@ -47,65 +47,65 @@ public class DiscordMetrics {
 	private final Histogram discordRestRequestResponseTime;
 	private final Counter discordRestHardFailures;
 
-	public DiscordMetrics(final CollectorRegistry registry) {
-		this.voiceChannelsConnected = Gauge.build()
+	public DiscordMetrics(final PrometheusRegistry registry) {
+		this.voiceChannelsConnected = Gauge.builder()
 			.name("discord_voicechannels_connected_current")
 			.help("How many voice channel is the bot connected to")
 			.register(registry);
 
-		this.discordEntities = Gauge.build()
+		this.discordEntities = Gauge.builder()
 			.name("discord_entities_current")
 			.help("How many entities are present")
 			.labelNames("type")
 			.register(registry);
 
-		this.unavailableGuilds = Gauge.build()
+		this.unavailableGuilds = Gauge.builder()
 			.name("discord_unavailable_guilds_current")
 			.help("How many guilds are unavailable")
 			.labelNames("shard")
 			.register(registry);
 
 
-		this.sessionStartLimitTotal = Gauge.build()
+		this.sessionStartLimitTotal = Gauge.builder()
 			.name("discord_session_start_limit_total")
 			.help("Maximum session start limit")
 			.register(registry);
 
-		this.sessionStartLimitRemaining = Gauge.build()
+		this.sessionStartLimitRemaining = Gauge.builder()
 			.name("discord_session_start_limit_remaining")
 			.help("Remaining session starts")
 			.register(registry);
 
-		this.recommendedShardCount = Gauge.build()
+		this.recommendedShardCount = Gauge.builder()
 			.name("discord_recommended_shard_count")
 			.help("Recommended shard count")
 			.register(registry);
 
-		this.events = Counter.build()
+		this.events = Counter.builder()
 			.name("discord_events_received_total")
 			.help("All received events by class")
 			.labelNames("class")
 			.register(registry);
 
-		this.closeCodes = Counter.build()
+		this.closeCodes = Counter.builder()
 			.name("discord_websocket_close_codes_total")
 			.help("Close codes of the main websocket connections")
 			.labelNames("code")
 			.register(registry);
 
-		this.discordRestRequests = Summary.build()
+		this.discordRestRequests = Summary.builder()
 			.name("discord_rest_request_seconds")
 			.help("Total Discord REST requests sent and their received responses")
 			.labelNames("method", "uri", "status", "error")
 			.register(registry);
 
-		this.discordRestRequestResponseTime = Histogram.build()
+		this.discordRestRequestResponseTime = Histogram.builder()
 			.name("discord_rest_request_response_time_seconds")
-			.exponentialBuckets(0.05, 1.2, 20)
+			.classicExponentialUpperBounds(0.05, 1.2, 20) // TODO use new native histograms when support becomes stable
 			.help("Discord REST request response time")
 			.register(registry);
 
-		this.discordRestHardFailures = Counter.build()
+		this.discordRestHardFailures = Counter.builder()
 			.name("discord_rest_request_hard_failures_total")
 			.help("Total Discord REST requests that experienced hard failures (not client response exceptions)")
 			.labelNames("method", "uri")

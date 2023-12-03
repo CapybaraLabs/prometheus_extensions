@@ -24,102 +24,110 @@
 
 package space.npstr.prometheus_extensions;
 
-import io.prometheus.client.Collector;
-import io.prometheus.client.CounterMetricFamily;
-import java.util.ArrayList;
-import java.util.List;
+import io.prometheus.metrics.core.metrics.CounterWithCallback;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import io.prometheus.metrics.model.snapshots.Unit;
+import java.util.function.Function;
 import net.ttddyy.dsproxy.QueryCount;
 import net.ttddyy.dsproxy.listener.SingleQueryCountHolder;
 
-public class QueryCountCollector extends Collector {
+public class QueryCountCollector {
+
+	private static final double MILLIS_PER_SECOND = 1000.0;
 
 	private final SingleQueryCountHolder queryCountHolder;
 
-	public QueryCountCollector(SingleQueryCountHolder queryCountHolder) {
+	public QueryCountCollector(SingleQueryCountHolder queryCountHolder, PrometheusRegistry registry) {
 		this.queryCountHolder = queryCountHolder;
+		String[] labelNames = {"datasource"};
+
+		CounterWithCallback.builder()
+			.name("jdbc_query_select_total")
+			.help("Total select queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getSelect))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_query_insert_total")
+			.help("Total insert queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getInsert))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_query_update_total")
+			.help("Total update queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getUpdate))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_query_delete_total")
+			.help("Total delete queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getDelete))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_query_other_total")
+			.help("Total other queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getOther))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_query_total")
+			.help("Total queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getTotal))
+			.register(registry);
+
+		CounterWithCallback.builder()
+			.name("jdbc_statement_total")
+			.help("Total statements")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getStatement))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_prepared_total")
+			.help("Total prepared statements")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getPrepared))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_callable_total")
+			.help("Total callable statements")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getCallable))
+			.register(registry);
+
+		CounterWithCallback.builder()
+			.name("jdbc_success_total")
+			.help("Total successful queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getSuccess))
+			.register(registry);
+		CounterWithCallback.builder()
+			.name("jdbc_failure_total")
+			.help("Total failed queries")
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, QueryCount::getFailure))
+			.register(registry);
+
+		CounterWithCallback.builder()
+			.name("jdbc_time_total")
+			.help("Total query execution time in seconds")
+			.unit(Unit.SECONDS)
+			.labelNames(labelNames)
+			.callback(callback -> collect(callback, qc -> qc.getTime() / MILLIS_PER_SECOND))
+			.register(registry);
 	}
 
-	@Override
-	public List<MetricFamilySamples> collect() {
-
-		List<MetricFamilySamples> mfs = new ArrayList<>();
-		List<String> labelNames = List.of("datasource");
-
-		CounterMetricFamily select = new CounterMetricFamily("jdbc_query_select_total",
-			"Total select queries", labelNames
-		);
-		mfs.add(select);
-		CounterMetricFamily insert = new CounterMetricFamily("jdbc_query_insert_total",
-			"Total insert queries", labelNames
-		);
-		mfs.add(insert);
-		CounterMetricFamily update = new CounterMetricFamily("jdbc_query_update_total",
-			"Total update queries", labelNames
-		);
-		mfs.add(update);
-		CounterMetricFamily delete = new CounterMetricFamily("jdbc_query_delete_total",
-			"Total delete queries", labelNames
-		);
-		mfs.add(delete);
-		CounterMetricFamily other = new CounterMetricFamily("jdbc_query_other_total",
-			"Total other queries", labelNames
-		);
-		mfs.add(other);
-		CounterMetricFamily total = new CounterMetricFamily("jdbc_query_total",
-			"Total queries", labelNames
-		);
-		mfs.add(total);
-
-		CounterMetricFamily statement = new CounterMetricFamily("jdbc_statement_total",
-			"Total statements", labelNames
-		);
-		mfs.add(statement);
-		CounterMetricFamily prepared = new CounterMetricFamily("jdbc_prepared_total",
-			"Total prepared statements", labelNames
-		);
-		mfs.add(prepared);
-		CounterMetricFamily callable = new CounterMetricFamily("jdbc_callable_total",
-			"Total callable statements", labelNames
-		);
-		mfs.add(callable);
-
-		CounterMetricFamily success = new CounterMetricFamily("jdbc_success_total",
-			"Total successful queries", labelNames
-		);
-		mfs.add(success);
-		CounterMetricFamily failure = new CounterMetricFamily("jdbc_failure_total",
-			"Total failed queries", labelNames
-		);
-		mfs.add(failure);
-
-		CounterMetricFamily time = new CounterMetricFamily("jdbc_time_total",
-			"Total query execution time in seconds", labelNames
-		);
-		mfs.add(time);
-
+	private void collect(CounterWithCallback.Callback callback, Function<QueryCount, Number> counter) {
 		for (var entry : this.queryCountHolder.getQueryCountMap().entrySet()) {
 			String datasourceName = entry.getKey();
 			QueryCount queryCount = entry.getValue();
-			List<String> labels = List.of(datasourceName);
 
-			select.addMetric(labels, queryCount.getSelect());
-			insert.addMetric(labels, queryCount.getInsert());
-			update.addMetric(labels, queryCount.getUpdate());
-			delete.addMetric(labels, queryCount.getDelete());
-			other.addMetric(labels, queryCount.getOther());
-			total.addMetric(labels, queryCount.getTotal());
+			double value = counter.apply(queryCount).doubleValue();
 
-			statement.addMetric(labels, queryCount.getStatement());
-			prepared.addMetric(labels, queryCount.getPrepared());
-			callable.addMetric(labels, queryCount.getCallable());
-
-			success.addMetric(labels, queryCount.getSuccess());
-			failure.addMetric(labels, queryCount.getFailure());
-
-			time.addMetric(labels, queryCount.getTime() / MILLISECONDS_PER_SECOND);
+			callback.call(value, datasourceName);
 		}
-
-		return mfs;
 	}
 }
 

@@ -111,7 +111,7 @@ public class D4JMetrics {
 				for (Map.Entry<Integer, Set<Long>> entry : unavailableGuilds.entrySet()) {
 					int shardId = entry.getKey();
 					Set<Long> guildIds = entry.getValue();
-					this.discordMetrics.getUnavailableGuilds().labels(Integer.toString(shardId)).set(guildIds.size());
+					this.discordMetrics.getUnavailableGuilds().labelValues(Integer.toString(shardId)).set(guildIds.size());
 				}
 			})
 			.doOnError(t -> log.warn("Failed to instrument unavailable guilds", t))
@@ -172,7 +172,7 @@ public class D4JMetrics {
 	}
 
 	private void doInstrument(long count, String label) {
-		this.discordMetrics.getDiscordEntities().labels(label).set(count);
+		this.discordMetrics.getDiscordEntities().labelValues(label).set(count);
 	}
 
 	private <T> Mono<T> logEntityCountError(Throwable throwable, String label) {
@@ -193,7 +193,7 @@ public class D4JMetrics {
 	private void instrumentEvents() {
 		this.gatewayDiscordClient.getEventDispatcher()
 			.on(Event.class)
-			.doOnNext(event -> this.discordMetrics.getEvents().labels(event.getClass().getSimpleName()).inc())
+			.doOnNext(event -> this.discordMetrics.getEvents().labelValues(event.getClass().getSimpleName()).inc())
 			.doOnError(t -> log.warn("Failed to track event", t))
 			.retry()
 			.subscribe();
@@ -210,7 +210,7 @@ public class D4JMetrics {
 
 	private void instrumentCloseCode(final DisconnectEvent event) {
 		int code = event.getStatus().getCode();
-		this.discordMetrics.getCloseCodes().labels(Integer.toString(code)).inc();
+		this.discordMetrics.getCloseCodes().labelValues(Integer.toString(code)).inc();
 
 		log.info("Shard {} websocket closed with {} {}",
 			formatShard(event.getShardInfo()), code, event.getStatus().getReason().orElse("No reason"),

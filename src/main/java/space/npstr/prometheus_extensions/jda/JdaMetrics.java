@@ -24,8 +24,9 @@
 
 package space.npstr.prometheus_extensions.jda;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
+import io.prometheus.metrics.core.metrics.Gauge;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import io.prometheus.metrics.model.snapshots.GaugeSnapshot;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,8 +57,8 @@ public class JdaMetrics {
 
 	private final Gauge distinctUsers;
 
-	public JdaMetrics(final ShardManager shardManager, final ScheduledExecutorService scheduler) {
-		this(shardManager, scheduler, CollectorRegistry.defaultRegistry);
+	public JdaMetrics(ShardManager shardManager, ScheduledExecutorService scheduler) {
+		this(shardManager, scheduler, PrometheusRegistry.defaultRegistry);
 	}
 
 	/**
@@ -66,8 +67,8 @@ public class JdaMetrics {
 	 *                     those calculations shall be run on the passed in executor
 	 */
 	public JdaMetrics(
-		final ShardManager shardManager, final ScheduledExecutorService scheduler,
-		final CollectorRegistry registry
+		ShardManager shardManager, ScheduledExecutorService scheduler,
+		PrometheusRegistry registry
 	) {
 		this.shardManager = shardManager;
 		this.metricsScheduler = new MetricsScheduler(scheduler, shardManager);
@@ -76,7 +77,7 @@ public class JdaMetrics {
 		final var metricsEventListener = new PrometheusMetricsEventListener(registry, discordMetrics);
 		this.shardManager.addEventListener(metricsEventListener);
 
-		this.distinctUsers = Gauge.build()
+		this.distinctUsers = Gauge.builder()
 			.name("jda_distinct_users_current")
 			.help("Total distinct users")
 			.register(registry);
@@ -86,7 +87,12 @@ public class JdaMetrics {
 	}
 
 	public int getDistinctUsers() {
-		return ((Double) this.distinctUsers.get()).intValue();
+		GaugeSnapshot.GaugeDataPointSnapshot datapoint = this.distinctUsers.collect().getDataPoints().stream()
+			.findFirst().orElse(null);
+		if (datapoint == null) {
+			return 0;
+		}
+		return (int) datapoint.getValue();
 	}
 
 	private void registerMetricsJobs() {
@@ -142,35 +148,35 @@ public class JdaMetrics {
 	}
 
 	private void countEntities() {
-		this.discordMetrics.getDiscordEntities().labels("Category")
+		this.discordMetrics.getDiscordEntities().labelValues("Category")
 			.set(countShardEntities(JDA::getCategoryCache));
-		this.discordMetrics.getDiscordEntities().labels("Guild")
+		this.discordMetrics.getDiscordEntities().labelValues("Guild")
 			.set(countShardEntities(JDA::getGuildCache));
-		this.discordMetrics.getDiscordEntities().labels("PrivateChannel")
+		this.discordMetrics.getDiscordEntities().labelValues("PrivateChannel")
 			.set(countShardEntities(JDA::getPrivateChannelCache));
-		this.discordMetrics.getDiscordEntities().labels("TextChannel")
+		this.discordMetrics.getDiscordEntities().labelValues("TextChannel")
 			.set(countShardEntities(JDA::getTextChannelCache));
-		this.discordMetrics.getDiscordEntities().labels("User")
+		this.discordMetrics.getDiscordEntities().labelValues("User")
 			.set(countShardEntities(JDA::getUserCache));
-		this.discordMetrics.getDiscordEntities().labels("VoiceChannel")
+		this.discordMetrics.getDiscordEntities().labelValues("VoiceChannel")
 			.set(countShardEntities(JDA::getVoiceChannelCache));
 
-		this.discordMetrics.getDiscordEntities().labels("Emote")
+		this.discordMetrics.getDiscordEntities().labelValues("Emote")
 			.set(countGuildEntities(Guild::getEmojiCache));
-		this.discordMetrics.getDiscordEntities().labels("Role")
+		this.discordMetrics.getDiscordEntities().labelValues("Role")
 			.set(countGuildEntities(Guild::getRoleCache));
 
 		countUnavailableGuilds(this.discordMetrics.getUnavailableGuilds());
 	}
 
-	private long countShardEntities(final Function<JDA, CacheView<?>> toCacheView) {
+	private long countShardEntities(Function<JDA, CacheView<?>> toCacheView) {
 		return this.shardManager.getShards().stream()
 			.map(toCacheView)
 			.mapToLong(CacheView::size)
 			.sum();
 	}
 
-	private long countGuildEntities(final Function<Guild, CacheView<?>> toCacheView) {
+	private long countGuildEntities(Function<Guild, CacheView<?>> toCacheView) {
 		return this.shardManager.getShards().stream()
 			.map(JDA::getGuildCache)
 			.flatMap(CacheView::stream)
@@ -183,7 +189,7 @@ public class JdaMetrics {
 		for (JDA jda : this.shardManager.getShards()) {
 			int shardId = jda.getShardInfo().getShardId();
 			int size = jda.getUnavailableGuilds().size();
-			unavailableGuilds.labels(Integer.toString(shardId)).set(size);
+			unavailableGuilds.labelValues(Integer.toString(shardId)).set(size);
 		}
 	}
 }

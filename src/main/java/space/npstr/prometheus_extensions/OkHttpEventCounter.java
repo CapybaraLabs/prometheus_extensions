@@ -24,7 +24,7 @@
 
 package space.npstr.prometheus_extensions;
 
-import io.prometheus.client.Counter;
+import io.prometheus.metrics.core.metrics.Counter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -41,7 +41,7 @@ import reactor.util.annotation.NonNull;
 
 public class OkHttpEventCounter extends EventListener {
 
-	private static final Counter httpEventCounter = Counter.build()
+	private static final Counter httpEventCounter = Counter.builder()
 		.name("okhttp_events_total")
 		.help("Total okhttp events")
 		.labelNames("instance", "event")
@@ -58,102 +58,102 @@ public class OkHttpEventCounter extends EventListener {
 
 	@Override
 	public void callStart(final @NonNull Call call) {
-		httpEventCounter.labels(this.instanceLabel, "callStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "callStart").inc();
 	}
 
 	@Override
 	public void dnsStart(@NonNull final Call call, @NonNull final String domainName) {
-		httpEventCounter.labels(this.instanceLabel, "dnsStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "dnsStart").inc();
 	}
 
 	@Override
 	public void dnsEnd(@NonNull final Call call, @NonNull final String domainName, @NonNull final List<InetAddress> inetAddressList) {
-		httpEventCounter.labels(this.instanceLabel, "dnsEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "dnsEnd").inc();
 	}
 
 	@Override
 	public void connectStart(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy) {
-		httpEventCounter.labels(this.instanceLabel, "connectStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "connectStart").inc();
 	}
 
 	@Override
 	public void secureConnectStart(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "secureConnectStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "secureConnectStart").inc();
 	}
 
 	@Override
 	public void secureConnectEnd(@NonNull final Call call, final Handshake handshake) {
-		httpEventCounter.labels(this.instanceLabel, "secureConnectEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "secureConnectEnd").inc();
 	}
 
 	@Override
 	public void connectEnd(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy, final Protocol protocol) {
-		httpEventCounter.labels(this.instanceLabel, "connectEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "connectEnd").inc();
 	}
 
 	@Override
 	public void connectFailed(@NonNull final Call call, @NonNull final InetSocketAddress inetSocketAddress, @NonNull final Proxy proxy, final Protocol protocol, @NonNull final IOException ioe) {
-		httpEventCounter.labels(this.instanceLabel, "connectFailed").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "connectFailed").inc();
 	}
 
 	@Override
 	public void connectionAcquired(@NonNull final Call call, @NonNull final Connection connection) {
-		httpEventCounter.labels(this.instanceLabel, "connectionAcquired").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "connectionAcquired").inc();
 	}
 
 	@Override
 	public void connectionReleased(@NonNull final Call call, @NonNull final Connection connection) {
-		httpEventCounter.labels(this.instanceLabel, "connectionReleased").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "connectionReleased").inc();
 	}
 
 	@Override
 	public void requestHeadersStart(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "requestHeadersStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "requestHeadersStart").inc();
 	}
 
 	@Override
 	public void requestHeadersEnd(@NonNull final Call call, @NonNull final Request request) {
-		httpEventCounter.labels(this.instanceLabel, "requestHeadersEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "requestHeadersEnd").inc();
 	}
 
 	@Override
 	public void requestBodyStart(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "requestBodyStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "requestBodyStart").inc();
 	}
 
 	@Override
 	public void requestBodyEnd(@NonNull final Call call, final long byteCount) {
-		httpEventCounter.labels(this.instanceLabel, "requestBodyEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "requestBodyEnd").inc();
 	}
 
 	@Override
 	public void responseHeadersStart(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "responseHeadersStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "responseHeadersStart").inc();
 	}
 
 	@Override
 	public void responseHeadersEnd(@NonNull final Call call, @NonNull final Response response) {
-		httpEventCounter.labels(this.instanceLabel, "responseHeadersEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "responseHeadersEnd").inc();
 	}
 
 	@Override
 	public void responseBodyStart(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "responseBodyStart").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "responseBodyStart").inc();
 	}
 
 	@Override
 	public void responseBodyEnd(@NonNull final Call call, final long byteCount) {
-		httpEventCounter.labels(this.instanceLabel, "responseBodyEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "responseBodyEnd").inc();
 	}
 
 	@Override
 	public void callEnd(@NonNull final Call call) {
-		httpEventCounter.labels(this.instanceLabel, "callEnd").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "callEnd").inc();
 	}
 
 	@Override
 	public void callFailed(@NonNull final Call call, @NonNull final IOException ioe) {
-		httpEventCounter.labels(this.instanceLabel, "callFailed").inc();
+		httpEventCounter.labelValues(this.instanceLabel, "callFailed").inc();
 	}
 }
 

@@ -24,8 +24,8 @@
 
 package space.npstr.prometheus_extensions.jda;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
+import io.prometheus.metrics.core.metrics.Counter;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import java.util.Optional;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.http.HttpRequestEvent;
@@ -50,9 +50,9 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	private final DiscordMetrics discordMetrics;
 	private final Counter httpRequests;
 
-	PrometheusMetricsEventListener(final CollectorRegistry registry, DiscordMetrics discordMetrics) {
+	PrometheusMetricsEventListener(PrometheusRegistry registry, DiscordMetrics discordMetrics) {
 		this.discordMetrics = discordMetrics;
-		this.httpRequests = Counter.build()
+		this.httpRequests = Counter.builder()
 			.name("jda_restactions_total")
 			.help("JDA restactions and their HTTP responses")
 			.labelNames("status", "route")
@@ -60,8 +60,8 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGenericEvent(final GenericEvent event) {
-		this.discordMetrics.getEvents().labels(event.getClass().getSimpleName()).inc();
+	public void onGenericEvent(GenericEvent event) {
+		this.discordMetrics.getEvents().labelValues(event.getClass().getSimpleName()).inc();
 	}
 
 	@Override
@@ -78,7 +78,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 			.findAny()
 			.orElse("null");
 
-		this.discordMetrics.getCloseCodes().labels(code).inc();
+		this.discordMetrics.getCloseCodes().labelValues(code).inc();
 	}
 
 	@Override
@@ -93,7 +93,7 @@ class PrometheusMetricsEventListener extends ListenerAdapter {
 
 		final String routeName = this.routeNamer.lookUpRouteName(route);
 
-		this.httpRequests.labels(code, routeName).inc();
+		this.httpRequests.labelValues(code, routeName).inc();
 	}
 
 

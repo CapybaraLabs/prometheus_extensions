@@ -35,7 +35,6 @@ import discord4j.rest.request.Router;
 import discord4j.rest.request.RouterOptions;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.prometheus.client.Collector;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
@@ -52,6 +51,7 @@ import space.npstr.prometheus_extensions.DiscordMetrics;
 public class InstrumentedRouter implements Router {
 
 	private static final Logger log = LoggerFactory.getLogger(InstrumentedRouter.class);
+	private static final double MILLIS_PER_SECOND = 1000.0;
 
 	private final DiscordMetrics discordMetrics;
 	private final Router delegate;
@@ -81,11 +81,11 @@ public class InstrumentedRouter implements Router {
 		ContextView contextView = response.getHttpResponse().currentContextView();
 		Instant requestStarted = Instant.ofEpochMilli(contextView.get(DiscordWebClient.KEY_REQUEST_TIMESTAMP));
 		long responseTimeMillis = Duration.between(requestStarted, Instant.now()).toMillis();
-		double responseTimeSeconds = responseTimeMillis / Collector.MILLISECONDS_PER_SECOND;
+		double responseTimeSeconds = responseTimeMillis / MILLIS_PER_SECOND;
 
 		log.trace("{} {} {}ms {}", method, uriTemplate, responseTimeMillis, status.code());
 		this.discordMetrics.getDiscordRestRequests()
-			.labels(method.name(), uriTemplate, Integer.toString(status.code()), "")
+			.labelValues(method.name(), uriTemplate, Integer.toString(status.code()), "")
 			.observe(responseTimeSeconds);
 		this.discordMetrics.getDiscordRestRequestResponseTime()
 			.observe(responseTimeSeconds);
@@ -104,11 +104,11 @@ public class InstrumentedRouter implements Router {
 			ContextView contextView = error.getResponse().currentContextView();
 			Instant requestStarted = Instant.ofEpochMilli(contextView.get(DiscordWebClient.KEY_REQUEST_TIMESTAMP));
 			long responseTimeMillis = Duration.between(requestStarted, Instant.now()).toMillis();
-			double responseTimeSeconds = responseTimeMillis / Collector.MILLISECONDS_PER_SECOND;
+			double responseTimeSeconds = responseTimeMillis / MILLIS_PER_SECOND;
 
 			log.trace("{} {} {}ms {} {} {}", method, uriTemplate, responseTimeMillis, status.code(), errorCode, errorMessage);
 			this.discordMetrics.getDiscordRestRequests()
-				.labels(method.name(), uriTemplate, Integer.toString(status.code()), Integer.toString(errorCode))
+				.labelValues(method.name(), uriTemplate, Integer.toString(status.code()), Integer.toString(errorCode))
 				.observe(responseTimeSeconds);
 			this.discordMetrics.getDiscordRestRequestResponseTime()
 				.observe(responseTimeSeconds);
@@ -120,7 +120,7 @@ public class InstrumentedRouter implements Router {
 		} else {
 			log.warn("Failed request to {} {}", method, uriTemplate, throwable);
 			this.discordMetrics.getDiscordRestHardFailures()
-				.labels(method.name(), uriTemplate)
+				.labelValues(method.name(), uriTemplate)
 				.inc();
 		}
 	}
