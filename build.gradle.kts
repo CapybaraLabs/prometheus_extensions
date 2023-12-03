@@ -2,8 +2,8 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("com.github.ben-manes.versions") version "0.48.0"
-    id("org.ajoberstar.grgit") version "5.2.0"
+    id("com.github.ben-manes.versions") version "0.50.0"
+    id("org.ajoberstar.grgit") version "5.2.1"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -34,14 +34,14 @@ repositories {
 
 val prometheusVersion = "0.16.0"
 val dsProxyVersion = "1.9"
-val jdaVersion = "5.0.0-beta.14"
+val jdaVersion = "5.0.0-beta.18"
 val troveVersion = "3.0.3"
 val fastutilVersion = "8.5.12"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
 val d4jCoreVersion = "3.2.6"
-val jUnitPlatformVersion = "1.10.0"
-val jUnitVersion = "5.10.0"
-val mockitoVersion = "5.5.0"
+val jUnitPlatformVersion = "1.10.1"
+val jUnitVersion = "5.10.1"
+val mockitoVersion = "5.8.0"
 val assertJVersion = "3.24.2"
 
 dependencies {
