@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
     idea
     id("com.github.ben-manes.versions") version "0.51.0"
-    id("org.ajoberstar.grgit") version "5.2.2"
+    id("org.ajoberstar.grgit") version "5.3.0"
 }
 
 group = "space.npstr.prometheus_extensions"
@@ -32,16 +32,16 @@ repositories {
 //    maven { url = uri("https://repo.spring.io/milestone") }                        // D4J snapshots
 }
 
-val prometheusVersion = "1.3.1"
+val prometheusVersion = "1.3.2"
 val dsProxyVersion = "1.10"
-val jdaVersion = "5.0.0"
+val jdaVersion = "5.1.2"
 val troveVersion = "3.0.3"
-val fastutilVersion = "8.5.13"
+val fastutilVersion = "8.5.15"
 // see https://oss.sonatype.org/content/repositories/snapshots/com/discord4j/discord4j-core/
 val d4jCoreVersion = "3.2.6"
-val jUnitPlatformVersion = "1.10.3"
-val jUnitVersion = "5.10.3"
-val mockitoVersion = "5.12.0"
+val jUnitPlatformVersion = "1.11.3"
+val jUnitVersion = "5.11.3"
+val mockitoVersion = "5.14.2"
 val assertJVersion = "3.26.3"
 
 dependencies {
