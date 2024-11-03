@@ -1,0 +1,80 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+    id "idea"
+    id "com.github.ben-manes.versions" version "$versionsPluginVersion"
+    id "org.ajoberstar.grgit" version "$grgitPluginVersion"
+}
+
+group = "space.npstr.prometheus_extensions"
+version = "1.9.1"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaVersion)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+    withSourcesJar()
+    consistentResolution {
+        useCompileClasspathVersions()
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://m2.dv8tion.net/releases"
+        content { includeModule("net.dv8tion", "JDA") }
+        content { includeGroup("club.minnced") }
+    }
+//    maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // D4J snapshots
+//    maven { url "https://repo.spring.io/milestone" }                        // D4J snapshots
+}
+
+dependencies {
+    api "io.prometheus:prometheus-metrics-core:$prometheusVersion"
+
+    compileOnly "net.ttddyy:datasource-proxy:$dsProxyVersion"
+
+    compileOnly "net.dv8tion:JDA:$jdaVersion"
+    // required for user count hax
+    compileOnly "net.sf.trove4j:trove4j:$troveVersion"
+    compileOnly "it.unimi.dsi:fastutil:$fastutilVersion"
+
+    compileOnly "com.discord4j:discord4j-core:$d4jCoreVersion"
+
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:$jUnitPlatformVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jUnitVersion"
+    testImplementation"org.junit.jupiter:junit-jupiter-api:$jUnitVersion"
+    testImplementation"net.dv8tion:JDA:$jdaVersion"
+    testImplementation"org.mockito:mockito-core:$mockitoVersion"
+    testImplementation"org.assertj:assertj-core:$assertJVersion"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
+static def isNonStable(String version) {
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?(_[0-9]+)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+// https://github.com/ben-manes/gradle-versions-plugin
+tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask) {
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+}
+
+publishing {
+    publications {
+        create("main", MavenPublication) {
+            from(components.java)
+        }
+    }
+}
