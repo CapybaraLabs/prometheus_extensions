@@ -32,7 +32,9 @@ repositories {
 }
 
 dependencies {
-    api "io.prometheus:prometheus-metrics-core:$prometheusVersion"
+    api platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+
+    api "io.prometheus:prometheus-metrics-core"
 
     compileOnly "net.ttddyy:datasource-proxy:$dsProxyVersion"
 
@@ -43,12 +45,12 @@ dependencies {
 
     compileOnly "com.discord4j:discord4j-core:$d4jCoreVersion"
 
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher:$jUnitPlatformVersion"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jUnitVersion"
-    testImplementation"org.junit.jupiter:junit-jupiter-api:$jUnitVersion"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+    testImplementation"org.junit.jupiter:junit-jupiter-api"
     testImplementation"net.dv8tion:JDA:$jdaVersion"
-    testImplementation"org.mockito:mockito-core:$mockitoVersion"
-    testImplementation"org.assertj:assertj-core:$assertJVersion"
+    testImplementation"org.mockito:mockito-core"
+    testImplementation"org.assertj:assertj-core"
 }
 
 test {
@@ -65,9 +67,10 @@ static def isNonStable(String version) {
 }
 
 // https://github.com/ben-manes/gradle-versions-plugin
+
 tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask) {
     rejectVersionIf {
-        isNonStable(candidate.version) && !isNonStable(currentVersion)
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
 }
 
