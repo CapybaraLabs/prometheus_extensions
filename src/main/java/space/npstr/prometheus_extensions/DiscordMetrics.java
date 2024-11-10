@@ -67,7 +67,7 @@ public class DiscordMetrics {
 
 
 		this.sessionStartLimitTotal = Gauge.builder()
-			.name("discord_session_start_limit_total")
+			.name("discord_session_start_limit")
 			.help("Maximum session start limit")
 			.register(registry);
 
