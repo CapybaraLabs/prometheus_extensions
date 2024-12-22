@@ -105,7 +105,11 @@ public class JdaMetrics {
 	}
 
 	private void sessionStartLimits() {
-		DataObject data = fetchSessionStartLimit(shardManager.getShards().stream().findAny().orElseThrow());
+		JDA api = shardManager.getShards().stream().findAny().orElse(null);
+		if (api == null) { // can happen in tests with a mocked JDA, ignore, no biggie.
+			return;
+		}
+		DataObject data = fetchSessionStartLimit(api);
 		DataObject sessionStartLimit = data.getObject("session_start_limit");
 		int total = sessionStartLimit.getInt("total");
 		int remaining = sessionStartLimit.getInt("remaining");
