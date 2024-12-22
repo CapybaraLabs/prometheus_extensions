@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "space.npstr.prometheus_extensions"
-version = "1.10.2"
+version = "1.10.3"
 
 java {
     toolchain {
@@ -23,7 +23,7 @@ java {
 repositories {
     mavenCentral()
     maven {
-        url "https://m2.dv8tion.net/releases"
+        url = "https://m2.dv8tion.net/releases"
         content { includeModule("net.dv8tion", "JDA") }
         content { includeGroup("club.minnced") }
     }
