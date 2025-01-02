@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "space.npstr.prometheus_extensions"
-version = "1.10.3"
+version = "$projectVersion"
 
 java {
     toolchain {
