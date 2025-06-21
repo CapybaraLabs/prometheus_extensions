@@ -74,6 +74,10 @@ tasks.withType(com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
     }
 }
 
+tasks.register("outdated") {
+    dependsOn dependencyUpdates
+}
+
 publishing {
     publications {
         create("main", MavenPublication) {
