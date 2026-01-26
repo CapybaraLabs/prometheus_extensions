@@ -37,7 +37,7 @@ import okhttp3.Handshake;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
-import reactor.util.annotation.NonNull;
+import org.jspecify.annotations.NonNull;
 
 public class OkHttpEventCounter extends EventListener {
 
