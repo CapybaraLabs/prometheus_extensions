@@ -11,13 +11,21 @@ version = "$projectVersion"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(javaVersion)
+        languageVersion = JavaLanguageVersion.of(theJavaVersion)
         vendor = JvmVendorSpec.ADOPTIUM
     }
     withSourcesJar()
     consistentResolution {
         useCompileClasspathVersions()
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+	dependsOn(processResources)
+	options.encoding = "UTF-8"
+	options.release.set(theJavaVersion.toInteger())
+	options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Xmaxerrs" << "10000" << "-Xdiags:verbose"
+	options.incremental = true
 }
 
 repositories {
