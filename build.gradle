@@ -2,7 +2,7 @@ plugins {
     id "java-library"
     id "maven-publish"
     id "idea"
-    id "com.github.ben-manes.versions" version "$versionsPluginVersion"
+    id "io.github.ben-manes.versions" version "$versionsPluginVersion"
     id "org.ajoberstar.grgit" version "$grgitPluginVersion"
 }
 
